@@ -56,6 +56,11 @@ local.properties
 .scala_dependencies
 .worksheet
 
+build/
+*.class
+*.jar
+*.war
+
 # Build directories
 build/
 target/

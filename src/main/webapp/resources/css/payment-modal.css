@@ -1,0 +1,631 @@
+/* CSS cho modal thanh toán */
+
+/* CSS cho modal container */
+#paymentModal .modal-content {
+    border-radius: 15px;
+    border: none;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+}
+
+#paymentModal .modal-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 15px 15px 0 0;
+    border-bottom: none;
+    padding: 20px 25px;
+}
+
+#paymentModal .modal-title {
+    font-weight: 600;
+    font-size: 1.3rem;
+}
+
+#paymentModal .modal-body {
+    padding: 25px;
+    background-color: #f8f9fa;
+}
+
+#paymentModal .close {
+    color: white;
+    opacity: 0.8;
+    font-size: 1.5rem;
+    text-shadow: none;
+}
+
+#paymentModal .close:hover {
+    opacity: 1;
+    color: white;
+}
+
+/* CSS cho fragment thanh toán */
+.payment-container {
+    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+}
+
+.section-title {
+    margin-bottom: 15px;
+    color: #333;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.order-details-section {
+    margin-bottom: 20px;
+}
+
+.payment-table {
+    width: 100%;
+    margin-bottom: 20px;
+    border-collapse: collapse;
+}
+
+.payment-table th,
+.payment-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.payment-table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #495057;
+}
+
+.payment-table tr:last-child td {
+    border-bottom: none;
+}
+
+.item-name {
+    font-weight: 500;
+}
+
+.item-gift-badge {
+    display: inline-block;
+    background-color: #8e44ad;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    margin-left: 5px;
+    vertical-align: middle;
+}
+
+.free-item {
+    color: #8e44ad;
+    font-style: italic;
+}
+
+/* CSS cho phần tổng tiền */
+.payment-summary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.payment-summary p {
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+.payment-summary h5 {
+    margin-top: 10px;
+    margin-bottom: 0;
+    font-weight: 700;
+}
+
+/* CSS cho form thanh toán */
+.payment-input-group {
+    margin-bottom: 20px;
+}
+
+#paymentForm label {
+    font-weight: 500;
+    margin-bottom: 5px;
+    display: block;
+}
+
+#paymentForm input,
+#paymentForm select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    transition: all 0.3s;
+}
+
+#paymentForm input:focus,
+#paymentForm select:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+    outline: none;
+}
+
+/* CSS cho phương thức thanh toán */
+.payment-method-section {
+    margin-bottom: 25px;
+}
+
+.payment-method-section h5 {
+    margin-bottom: 15px;
+    font-weight: 500;
+}
+
+.payment-methods {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.payment-method-item {
+    flex: 1;
+    text-align: center;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.payment-method-item:hover,
+.payment-method-item.active {
+    border-color: #3498db;
+    background-color: rgba(52, 152, 219, 0.1);
+}
+
+.payment-method-item i {
+    display: block;
+    font-size: 24px;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+.payment-method-item.active i {
+    color: #3498db;
+}
+
+/* Ẩn radio button thực tế */
+.method-radio {
+    position: absolute;
+    opacity: 0;
+}
+
+/* Nút xác nhận thanh toán */
+.payment-submit-btn {
+    background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 12px 20px;
+    font-size: 1rem;
+    font-weight: 500;
+    width: 100%;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 2px 5px rgba(46, 204, 113, 0.3);
+    margin-top: 10px;
+}
+
+.payment-submit-btn:hover {
+    box-shadow: 0 4px 10px rgba(46, 204, 113, 0.4);
+    transform: translateY(-2px);
+}
+
+.payment-submit-btn:active {
+    transform: translateY(0);
+}
+
+/* CSS cho trang thanh toán thành công */
+.success-container {
+    padding: 30px 20px;
+    text-align: center;
+    position: relative;
+}
+
+.success-icon-wrap {
+    margin-bottom: 20px;
+}
+
+.success-icon {
+    font-size: 70px;
+    color: #27ae60;
+    animation: scaleIn 0.5s ease-out;
+}
+
+@keyframes scaleIn {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    60% {
+        transform: scale(1.2);
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.success-title {
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 25px;
+    font-size: 1.6rem;
+    animation: fadeIn 0.5s ease-out 0.3s both;
+}
+
+.success-details {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    animation: fadeIn 0.5s ease-out 0.5s both;
+}
+
+.success-detail-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.success-detail-item:last-child {
+    border-bottom: none;
+}
+
+.success-detail-item i {
+    font-size: 18px;
+    color: #3498db;
+    margin-right: 10px;
+    width: 25px;
+    text-align: center;
+}
+
+.detail-label {
+    font-weight: 500;
+    flex: 1;
+    text-align: left;
+    color: #555;
+}
+
+.detail-value {
+    font-weight: 600;
+    color: #333;
+}
+
+.success-message {
+    font-style: italic;
+    color: #7f8c8d;
+    margin-bottom: 25px;
+    animation: fadeIn 0.5s ease-out 0.7s both;
+}
+
+.success-footer {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    animation: fadeIn 0.5s ease-out 0.9s both;
+}
+
+.btn-close,
+.btn-goto-tables {
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-close {
+    background-color: #e0e0e0;
+    color: #333;
+    border: none;
+}
+
+.btn-goto-tables {
+    background-color: #3498db;
+    color: white;
+    text-decoration: none;
+    border: none;
+}
+
+.btn-close:hover {
+    background-color: #d0d0d0;
+}
+
+.btn-goto-tables:hover {
+    background-color: #2980b9;
+    text-decoration: none;
+    color: white;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Payment Modal Styles */
+.payment-modal .modal-content {
+    border-radius: 15px;
+    border: none;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+}
+
+.payment-modal .modal-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 15px 15px 0 0;
+    border-bottom: none;
+    padding: 20px 25px;
+}
+
+.payment-modal .modal-title {
+    font-weight: 600;
+    font-size: 1.3rem;
+}
+
+.payment-modal .close {
+    color: white;
+    opacity: 0.8;
+    font-size: 1.5rem;
+    text-shadow: none;
+}
+
+.payment-modal .close:hover {
+    opacity: 1;
+    color: white;
+}
+
+.payment-modal .modal-body {
+    padding: 25px;
+    background-color: #f8f9fa;
+}
+
+.payment-info {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    border-left: 4px solid #667eea;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.payment-info h6 {
+    color: #667eea;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.order-summary {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.order-summary h6 {
+    color: #28a745;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.order-summary .table {
+    margin-bottom: 0;
+}
+
+.order-summary .table th {
+    background-color: #f8f9fa;
+    border-top: none;
+    font-weight: 600;
+    color: #495057;
+    font-size: 0.9rem;
+}
+
+.order-summary .table td {
+    vertical-align: middle;
+    font-size: 0.9rem;
+}
+
+.badge-gift {
+    background-color: #28a745;
+    font-size: 0.7rem;
+}
+
+.payment-calculation {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.payment-method {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.payment-method h6 {
+    color: #17a2b8;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.payment-method .form-check {
+    margin-bottom: 10px;
+}
+
+.payment-method .form-check-label {
+    font-weight: 500;
+    color: #495057;
+    cursor: pointer;
+    padding: 10px 15px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    display: block;
+    width: 100%;
+}
+
+.payment-method .form-check-input:checked + .form-check-label {
+    background-color: #667eea;
+    border-color: #667eea;
+    color: white;
+}
+
+.payment-method .form-check-label:hover {
+    border-color: #667eea;
+    background-color: rgba(102, 126, 234, 0.1);
+}
+
+.payment-modal .modal-footer {
+    background-color: #f8f9fa;
+    border-top: none;
+    border-radius: 0 0 15px 15px;
+    padding: 20px 25px;
+}
+
+.payment-modal .btn {
+    padding: 10px 25px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.payment-modal .btn-success {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    border: none;
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+}
+
+.payment-modal .btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+}
+
+.payment-modal .btn-secondary {
+    background-color: #6c757d;
+    border: none;
+}
+
+/* Success Modal Styles */
+.success-modal .modal-content {
+    border-radius: 20px;
+    border: none;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+.success-modal .modal-header {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    border-bottom: none;
+    padding: 30px 25px 20px;
+    text-align: center;
+}
+
+.success-icon {
+    font-size: 4rem;
+    margin-bottom: 15px;
+    animation: successPulse 1.5s ease-in-out;
+}
+
+@keyframes successPulse {
+    0% { transform: scale(0); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.success-modal .modal-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0;
+}
+
+.success-modal .modal-body {
+    padding: 30px 25px;
+    text-align: center;
+    background: white;
+}
+
+.payment-details {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 15px;
+    margin: 20px 0;
+}
+
+.amount-display {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #28a745;
+    margin: 15px 0;
+}
+
+.success-message {
+    font-size: 1.1rem;
+    color: #495057;
+    margin-bottom: 20px;
+}
+
+.success-modal .modal-footer {
+    background: #f8f9fa;
+    border-top: none;
+    padding: 20px 25px;
+    text-align: center;
+}
+
+.success-modal .btn {
+    padding: 12px 30px;
+    border-radius: 25px;
+    font-weight: 600;
+    margin: 0 10px;
+    transition: all 0.3s ease;
+}
+
+.success-modal .btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.success-modal .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+/* Animation effects */
+.modal.fade .modal-dialog {
+    transition: transform 0.4s ease-out;
+}
+
+.modal.show .modal-dialog {
+    transform: scale(1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .payment-modal .modal-dialog,
+    .success-modal .modal-dialog {
+        margin: 10px;
+    }
+    
+    .payment-calculation .row {
+        margin: 0;
+    }
+    
+    .payment-calculation .col-md-6 {
+        padding: 0 0 15px 0;
+    }
+}

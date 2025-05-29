@@ -1,0 +1,89 @@
+/* Custom styles for table cards */
+.table-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-base);
+    border: 2px solid var(--gray-200);
+    overflow: hidden;
+    transition: all var(--transition-fast);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.table-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.table-header {
+    padding: var(--space-lg);
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    border-bottom: 1px solid var(--gray-200);
+    text-align: center;
+}
+
+.table-number {
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    color: var(--gray-900);
+    margin-bottom: var(--space-xs);
+}
+
+.table-body {
+    padding: var(--space-lg);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.table-info-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: var(--font-size-sm);
+}
+
+.table-info-item i {
+    width: 16px;
+    color: var(--gray-500);
+}
+
+.table-footer {
+    padding: var(--space-md) var(--space-lg);
+    border-top: 1px solid var(--gray-200);
+    background: var(--gray-50);
+}
+
+.table-status-indicator {
+    position: absolute;
+    top: var(--space-md);
+    right: var(--space-md);
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: var(--shadow-sm);
+}
+
+.status-available { 
+    background: var(--success-color); 
+}
+
+.status-serving { 
+    background: var(--warning-color); 
+}
+
+.status-reserved { 
+    background: var(--info-color); 
+}
+
+.status-cleaning { 
+    background: var(--gray-500); 
+}
+
+.status-pending-payment { 
+    background: var(--danger-color); 
+} 

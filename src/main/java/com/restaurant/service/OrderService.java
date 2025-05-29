@@ -37,4 +37,8 @@ public class OrderService {
     public List<Order> findByTableId(Long tableId) {
         return orderDAO.findByTableId(tableId);
     }
+
+    public List<Order> findAllToday() {
+        return orderDAO.findAllToday();
+    }
 }

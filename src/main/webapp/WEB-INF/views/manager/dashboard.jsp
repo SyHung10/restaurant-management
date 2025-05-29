@@ -9,11 +9,11 @@ uri="http://java.sun.com/jsp/jstl/core" %>
     <title>Dashboard - Hệ thống POS Nhà hàng</title>
     <link
       rel="stylesheet"
-      href="${pageContext.request.contextPath}/resources/css/manager-global.css"
+      href="${pageContext.request.contextPath}/resources/css/manager/global.css"
     />
     <link
       rel="stylesheet"
-      href="${pageContext.request.contextPath}/resources/css/dashboard.css"
+      href="${pageContext.request.contextPath}/resources/css/manager/dashboard.css"
     />
     <link
       rel="stylesheet"

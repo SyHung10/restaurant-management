@@ -10,7 +10,7 @@ uri="http://java.sun.com/jsp/jstl/functions" %>
     <title>Quản lý bàn - Hệ thống POS</title>
     <link
       rel="stylesheet"
-      href="${pageContext.request.contextPath}/resources/css/manager-global.css"
+      href="${pageContext.request.contextPath}/resources/css/manager/global.css"
     />
     <link
       rel="stylesheet"

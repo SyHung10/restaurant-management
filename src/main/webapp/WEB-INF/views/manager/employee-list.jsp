@@ -9,7 +9,7 @@ uri="http://java.sun.com/jsp/jstl/core" %>
     <title>Quản lý nhân viên - Hệ thống POS</title>
     <link
       rel="stylesheet"
-      href="${pageContext.request.contextPath}/resources/css/manager-global.css"
+      href="${pageContext.request.contextPath}/resources/css/manager/global.css"
     />
     <link
       rel="stylesheet"

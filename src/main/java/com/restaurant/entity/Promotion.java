@@ -3,7 +3,6 @@ package com.restaurant.entity;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.sql.Time;
 import java.util.Date;
 
 @Entity
@@ -14,38 +13,47 @@ public class Promotion implements Serializable {
     @Column(name = "promotion_id")
     private Long promotionId;
 
-    @Column(name = "type", nullable = false)
-    private String type;
-
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", nullable = false, length = 100)
     private String name;
 
     @Column(name = "start_time")
-    private Time startTime;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date startTime;
 
     @Column(name = "end_time")
-    private Time endTime;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date endTime;
 
-    @Column(name = "discount_percent")
+    @Column(name = "discount_percent", precision = 5, scale = 2)
     private BigDecimal discountPercent;
 
-    @Column(name = "voucher_code")
+    @Column(name = "voucher_code", length = 50)
     private String voucherCode;
 
-    @Column(name = "discount_value")
+    @Column(name = "discount_value", precision = 10, scale = 2)
     private BigDecimal discountValue;
 
-    @Column(name = "is_percent")
-    private Boolean isPercent;
-
-    @Column(name = "expiry_date")
-    private Date expiryDate;
+    @Column(name = "is_percent", nullable = false)
+    private Boolean isPercent = false;
 
     @Column(name = "max_usage")
     private Integer maxUsage;
 
-    @Column(name = "status", nullable = false)
-    private String status;
+    @Column(name = "status", nullable = false, length = 20)
+    private String status = "ACTIVE";
+
+    @Column(name = "order_minimum", nullable = false, precision = 10, scale = 2)
+    private BigDecimal orderMinimum = BigDecimal.ZERO;
+
+    @Column(name = "scope_type", nullable = false, length = 20)
+    private String scopeType = "ALL";
+
+    @Column(name = "target_id")
+    private Long targetId;
+
+    // Constructors
+    public Promotion() {
+    }
 
     // Getters and Setters
     public Long getPromotionId() {
@@ -56,14 +64,6 @@ public class Promotion implements Serializable {
         this.promotionId = promotionId;
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
     public String getName() {
         return name;
     }
@@ -72,19 +72,19 @@ public class Promotion implements Serializable {
         this.name = name;
     }
 
-    public Time getStartTime() {
+    public Date getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(Time startTime) {
+    public void setStartTime(Date startTime) {
         this.startTime = startTime;
     }
 
-    public Time getEndTime() {
+    public Date getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(Time endTime) {
+    public void setEndTime(Date endTime) {
         this.endTime = endTime;
     }
 
@@ -120,14 +120,6 @@ public class Promotion implements Serializable {
         this.isPercent = isPercent;
     }
 
-    public Date getExpiryDate() {
-        return expiryDate;
-    }
-
-    public void setExpiryDate(Date expiryDate) {
-        this.expiryDate = expiryDate;
-    }
-
     public Integer getMaxUsage() {
         return maxUsage;
     }
@@ -142,5 +134,64 @@ public class Promotion implements Serializable {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public BigDecimal getOrderMinimum() {
+        return orderMinimum;
+    }
+
+    public void setOrderMinimum(BigDecimal orderMinimum) {
+        this.orderMinimum = orderMinimum;
+    }
+
+    public String getScopeType() {
+        return scopeType;
+    }
+
+    public void setScopeType(String scopeType) {
+        this.scopeType = scopeType;
+    }
+
+    public Long getTargetId() {
+        return targetId;
+    }
+
+    public void setTargetId(Long targetId) {
+        this.targetId = targetId;
+    }
+
+    // Utility methods
+    public boolean isActive() {
+        return "ACTIVE".equals(this.status);
+    }
+
+    public boolean isPercentageDiscount() {
+        return Boolean.TRUE.equals(this.isPercent);
+    }
+
+    public boolean isFixedAmountDiscount() {
+        return Boolean.FALSE.equals(this.isPercent);
+    }
+
+    public boolean isApplicableToAll() {
+        return "ALL".equals(this.scopeType);
+    }
+
+    public boolean isApplicableToCategory() {
+        return "CATEGORY".equals(this.scopeType);
+    }
+
+    public boolean isApplicableToDish() {
+        return "DISH".equals(this.scopeType);
+    }
+
+    @Override
+    public String toString() {
+        return "Promotion{" +
+                "promotionId=" + promotionId +
+                ", name='" + name + '\'' +
+                ", status='" + status + '\'' +
+                ", scopeType='" + scopeType + '\'' +
+                '}';
     }
 }

@@ -5,8 +5,8 @@
 
         <head>
             <meta charset="UTF-8">
-            <title>Chọn bàn cần thanh toán</title>
-            <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+            <title>Danh sách bàn cần thanh toán</title>
+            <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/common/style.css">
         </head>
 
         <body>

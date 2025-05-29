@@ -93,4 +93,23 @@ public class OrderDAO {
             s.close();
         }
     }
+
+    // Lấy tất cả order trong ngày (từ 00:00)
+    @SuppressWarnings("unchecked")
+    public List<Order> findAllToday() {
+        Session s = sessionFactory.openSession();
+        try {
+            java.util.Calendar cal = java.util.Calendar.getInstance();
+            cal.set(java.util.Calendar.HOUR_OF_DAY, 0);
+            cal.set(java.util.Calendar.MINUTE, 0);
+            cal.set(java.util.Calendar.SECOND, 0);
+            cal.set(java.util.Calendar.MILLISECOND, 0);
+            java.util.Date todayStart = cal.getTime();
+            return s.createQuery("from Order where orderTime >= :todayStart")
+                    .setParameter("todayStart", todayStart)
+                    .list();
+        } finally {
+            s.close();
+        }
+    }
 }

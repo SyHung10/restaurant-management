@@ -53,20 +53,4 @@ public class PromotionDAO {
             session.close();
         }
     }
-
-    /**
-     * Đếm số lần sử dụng voucher từ bảng Payment
-     */
-    public long countUsageByPromotionId(Long promotionId) {
-        Session session = sessionFactory.openSession();
-        try {
-            Number count = (Number) session
-                    .createQuery("select count(*) from Payment where promotionId = :promotionId")
-                    .setParameter("promotionId", promotionId)
-                    .uniqueResult();
-            return count != null ? count.longValue() : 0L;
-        } finally {
-            session.close();
-        }
-    }
 }

@@ -38,33 +38,4 @@ public class PromotionService {
     public Promotion findByVoucherCode(String voucherCode) {
         return promotionDAO.findByVoucherCode(voucherCode);
     }
-
-    /**
-     * Đếm số lần sử dụng voucher
-     */
-    public long countUsageByPromotionId(Long promotionId) {
-        return promotionDAO.countUsageByPromotionId(promotionId);
-    }
-
-    /**
-     * Kiểm tra xem voucher có còn sử dụng được hay không
-     */
-    public boolean isVoucherAvailable(Promotion promotion) {
-        if (promotion == null || !"ACTIVE".equals(promotion.getStatus())) {
-            return false;
-        }
-        
-        // Chỉ kiểm tra với voucher type
-        if (!"VOUCHER".equals(promotion.getType())) {
-            return true;
-        }
-        
-        // Kiểm tra max usage
-        if (promotion.getMaxUsage() != null && promotion.getMaxUsage() > 0) {
-            long currentUsage = countUsageByPromotionId(promotion.getPromotionId());
-            return currentUsage < promotion.getMaxUsage();
-        }
-        
-        return true;
-    }
 }

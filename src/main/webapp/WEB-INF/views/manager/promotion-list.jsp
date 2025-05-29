@@ -1,5 +1,4 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
     <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html lang="vi">
@@ -8,7 +7,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản lý khuyến mãi - Hệ thống POS</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/manager-global.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/promotion-usage.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         </head>
         <body>
@@ -93,8 +91,8 @@
                         <div class="card-body text-center">
                             <div class="text-2xl font-bold text-gray-900">
                                 <c:set var="activeCount" value="0"/>
-                                <c:forEach var="promotionWithUsage" items="${promotions}">
-                                    <c:if test="${promotionWithUsage.promotion.status == 'ACTIVE'}">
+                                <c:forEach var="promotion" items="${promotions}">
+                                    <c:if test="${promotion.status == 'ACTIVE'}">
                                         <c:set var="activeCount" value="${activeCount + 1}"/>
                                     </c:if>
                                 </c:forEach>
@@ -107,8 +105,8 @@
                         <div class="card-body text-center">
                             <div class="text-2xl font-bold text-gray-900">
                                 <c:set var="hourCount" value="0"/>
-                                <c:forEach var="promotionWithUsage" items="${promotions}">
-                                    <c:if test="${promotionWithUsage.promotion.type == 'HOUR'}">
+                                <c:forEach var="promotion" items="${promotions}">
+                                    <c:if test="${promotion.type == 'HOUR'}">
                                         <c:set var="hourCount" value="${hourCount + 1}"/>
                                     </c:if>
                                 </c:forEach>
@@ -121,8 +119,8 @@
                         <div class="card-body text-center">
                             <div class="text-2xl font-bold text-gray-900">
                                 <c:set var="voucherCount" value="0"/>
-                                <c:forEach var="promotionWithUsage" items="${promotions}">
-                                    <c:if test="${promotionWithUsage.promotion.type == 'VOUCHER'}">
+                                <c:forEach var="promotion" items="${promotions}">
+                                    <c:if test="${promotion.type == 'VOUCHER'}">
                                         <c:set var="voucherCount" value="${voucherCount + 1}"/>
                                     </c:if>
                                 </c:forEach>
@@ -135,8 +133,7 @@
 
                 <!-- Promotions Grid -->
                 <div class="grid grid-cols-1 gap-lg">
-                    <c:forEach var="promotionWithUsage" items="${promotions}">
-                        <c:set var="promotion" value="${promotionWithUsage.promotion}" />
+                    <c:forEach var="promotion" items="${promotions}">
                         <div class="card">
                             <div class="card-header">
                                 <div class="flex justify-between items-start">
@@ -164,25 +161,6 @@
                                         </div>
                                     </div>
                                     <div class="flex gap-sm">
-                                        <!-- Badge trạng thái usage (chỉ hiển thị với voucher) -->
-                                        <c:if test="${promotion.type == 'VOUCHER' && promotion.maxUsage != null && promotion.maxUsage > 0}">
-                                            <c:choose>
-                                                <c:when test="${!promotionWithUsage.available}">
-                                                    <span class="badge badge-danger">
-                                                        <i class="fas fa-times-circle"></i>
-                                                        <span>Hết lượt</span>
-                                                    </span>
-                                                </c:when>
-                                                <c:when test="${promotionWithUsage.usagePercentage >= 80}">
-                                                    <span class="badge badge-warning">
-                                                        <i class="fas fa-exclamation-triangle"></i>
-                                                        <span>Sắp hết</span>
-                                                    </span>
-                                                </c:when>
-                                            </c:choose>
-                                        </c:if>
-                                        
-                                        <!-- Badge trạng thái hoạt động -->
                                         <c:choose>
                                             <c:when test="${promotion.status == 'ACTIVE'}">
                                                 <span class="badge badge-success">
@@ -244,54 +222,20 @@
                                                     <div class="text-sm font-semibold text-gray-700 mb-xs">Hạn sử dụng</div>
                                                     <div class="flex items-center gap-sm">
                                                         <i class="fas fa-calendar text-gray-400"></i>
-                                                        <span><fmt:formatDate value="${promotion.expiryDate}" pattern="dd/MM/yyyy"/></span>
+                                                        <span>${promotion.expiryDate}</span>
                                                     </div>
                                                 </div>
                                             </c:if>
                                             
-                                            <!-- Hiển thị thông tin usage -->
-                                            <div class="mb-md">
-                                                <div class="text-sm font-semibold text-gray-700 mb-xs">Tình trạng sử dụng</div>
-                                                <c:choose>
-                                                    <c:when test="${promotion.maxUsage != null && promotion.maxUsage > 0}">
-                                                        <div class="flex items-center gap-sm mb-xs">
-                                                            <i class="fas fa-chart-line text-gray-400"></i>
-                                                            <span>${promotionWithUsage.usageCount} / ${promotion.maxUsage} lượt</span>
-                                                            <c:if test="${!promotionWithUsage.available}">
-                                                                <span class="text-danger-color font-bold">(Hết lượt)</span>
-                                                            </c:if>
-                                                        </div>
-                                                        
-                                                        <!-- Progress bar -->
-                                                        <div class="progress-bar">
-                                                            <c:choose>
-                                                                <c:when test="${promotionWithUsage.usagePercentage >= 100}">
-                                                                    <div class="progress-fill" style="width: ${promotionWithUsage.usagePercentage}%; background-color: #dc2626;"></div>
-                                                                </c:when>
-                                                                <c:when test="${promotionWithUsage.usagePercentage >= 80}">
-                                                                    <div class="progress-fill" style="width: ${promotionWithUsage.usagePercentage}%; background-color: #d97706;"></div>
-                                                                </c:when>
-                                                                <c:otherwise>
-                                                                    <div class="progress-fill" style="width: ${promotionWithUsage.usagePercentage}%; background-color: #16a34a;"></div>
-                                                                </c:otherwise>
-                                                            </c:choose>
-                                                        </div>
-                                                        
-                                                        <c:if test="${promotionWithUsage.available}">
-                                                            <div class="text-xs text-gray-500 mt-xs">
-                                                                Còn lại: ${promotionWithUsage.remainingUsage} lượt
-                                                            </div>
-                                                        </c:if>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <div class="flex items-center gap-sm">
-                                                            <i class="fas fa-infinity text-gray-400"></i>
-                                                            <span>Đã sử dụng: ${promotionWithUsage.usageCount} lượt</span>
-                                                        </div>
-                                                        <div class="text-xs text-gray-500 mt-xs">Không giới hạn số lần sử dụng</div>
-                                                    </c:otherwise>
-                                                </c:choose>
-                                            </div>
+                                            <c:if test="${promotion.maxUsage != null}">
+                                                <div class="mb-md">
+                                                    <div class="text-sm font-semibold text-gray-700 mb-xs">Số lần sử dụng tối đa</div>
+                                                    <div class="flex items-center gap-sm">
+                                                        <i class="fas fa-user-check text-gray-400"></i>
+                                                        <span>${promotion.maxUsage} lượt</span>
+                                                    </div>
+                                                </div>
+                                            </c:if>
                                         </c:if>
                                     </div>
                                 </div>
@@ -307,7 +251,7 @@
                                             <i class="fas fa-edit"></i>
                                             <span>Sửa</span>
                                         </a>
-                                        <a href="${pageContext.request.contextPath}/manager/promotions/delete/${promotion.promotionId}"
+                                <a href="${pageContext.request.contextPath}/manager/promotions/delete/${promotion.promotionId}"
                                            onclick="return confirm('Bạn có chắc muốn xóa khuyến mãi ${promotion.name}?')"
                                            class="btn btn-sm btn-danger">
                                             <i class="fas fa-trash"></i>
@@ -346,6 +290,5 @@
     </div>
 
     <script src="${pageContext.request.contextPath}/resources/js/promotion-list.js"></script>
-    <script src="${pageContext.request.contextPath}/resources/js/promotion-usage.js"></script>
         </body>
         </html>

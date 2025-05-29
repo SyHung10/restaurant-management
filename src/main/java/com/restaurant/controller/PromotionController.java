@@ -2,7 +2,6 @@ package com.restaurant.controller;
 
 import com.restaurant.entity.Promotion;
 import com.restaurant.service.PromotionService;
-import com.restaurant.dto.PromotionWithUsage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,8 +16,6 @@ import java.beans.PropertyEditorSupport;
 import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.util.Date;
-import java.util.List;
-import java.util.ArrayList;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -32,16 +29,7 @@ public class PromotionController {
     // Danh sách khuyến mãi
     @RequestMapping(value = "/promotions", method = RequestMethod.GET)
     public String listPromotions(Model model) {
-        List<Promotion> promotions = promotionService.findAll();
-        List<PromotionWithUsage> promotionsWithUsage = new ArrayList<PromotionWithUsage>();
-        
-        for (Promotion promotion : promotions) {
-            long usageCount = promotionService.countUsageByPromotionId(promotion.getPromotionId());
-            PromotionWithUsage promotionWithUsage = new PromotionWithUsage(promotion, usageCount);
-            promotionsWithUsage.add(promotionWithUsage);
-        }
-        
-        model.addAttribute("promotions", promotionsWithUsage);
+        model.addAttribute("promotions", promotionService.findAll());
         return "manager/promotion-list";
     }
 

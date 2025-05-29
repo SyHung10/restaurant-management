@@ -149,7 +149,7 @@
 .stat-card:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
-}
+    }
 
 .stat-header {
     display: flex;
@@ -167,20 +167,20 @@
     justify-content: center;
     color: white;
     font-size: var(--font-size-xl);
-}
+    }
 
 .stat-value {
     font-size: var(--font-size-3xl);
     font-weight: 700;
     color: var(--gray-900);
     margin-bottom: var(--space-xs);
-}
+    }
 
 .stat-label {
     font-size: var(--font-size-sm);
     color: var(--gray-600);
     margin-bottom: var(--space-sm);
-}
+    }
 
 .stat-change {
     font-size: var(--font-size-sm);
@@ -196,8 +196,8 @@
 
 .stat-change.negative {
     color: var(--danger-color);
-}
+    }
 
 .stat-change.neutral {
     color: var(--gray-500);
-} 
+}

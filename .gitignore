@@ -1,15 +1,35 @@
-# Eclipse specific files
-.metadata
+# Eclipse specific files and folders
+.metadata/
+.settings/
+.project
+.classpath
+.buildpath
+.loadpath
+.recommenders/
+.target/
+
+# Build folders
+build/
+target/
+dist/
 bin/
+
+# Cursor IDE files
+.cursor/
+
+# Compiled class files
+*.class
+
+# Log files
+*.log
+
+# Temporary files
 tmp/
 *.tmp
 *.bak
 *.swp
 *~.nib
 local.properties
-.settings/
-.loadpath
-.recommenders
 
 # External tool builders
 .externalToolBuilders/
@@ -32,9 +52,6 @@ local.properties
 # PDT-specific (PHP Development Tools)
 .buildpath
 
-# sbteclipse plugin
-.target
-
 # Tern plugin
 .tern-project
 
@@ -55,17 +72,6 @@ local.properties
 .cache-main
 .scala_dependencies
 .worksheet
-
-# Build directories
-build/
-target/
-dist/
-
-# Compiled class files
-*.class
-
-# Log files
-*.log
 
 # BlueJ files
 *.ctxt
@@ -110,4 +116,13 @@ WebContent/META-INF/
 *.orig
 
 # Temporary files
-*.temp 
+*.temp
+
+# Server logs
+*.out
+
+# Only keep src folder and essential config files
+# Everything else will be ignored except:
+# - src/
+# - web.xml (if in WebContent/WEB-INF/)
+# - Essential Spring config files 

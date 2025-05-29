@@ -7,20 +7,20 @@
             <head>
                 <meta charset="UTF-8">
                 <title>Menu & Đơn hàng bàn ${table.tableNumber}</title>
-                <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
+                <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/common/style.css">
                 <!-- Thêm Bootstrap CSS -->
                 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
                 <!-- Thêm Font Awesome cho các icon -->
                 <link rel="stylesheet"
                     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
                 <!-- Thêm CSS tùy chỉnh -->
-                <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/menu-style.css">
+                <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/employee/menu-style.css">
                 <!-- Thêm CSS thanh toán -->
-                <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/payment-modal.css">
+                <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/employee/payment-modal.css">
                 <!-- Thêm CSS trạng thái đơn hàng -->
-                <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/menu-order-status.css">
+                <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/employee/menu-order-status.css">
                 <!-- Thêm CSS cho modal thêm bàn phụ -->
-                <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/add-table-modal.css">
+                <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/employee/add-table-modal.css">
 
             </head>
 
@@ -277,7 +277,7 @@
                                         </div>
                                         <button type="button" class="add-table-btn-new" data-toggle="modal" data-target="#addTableModal">
                                             <i class="fas fa-plus mr-1"></i>Thêm bàn
-                                        </button>
+                                                        </button>
                                     </div>
                                 </c:if>
 
@@ -442,16 +442,23 @@
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label>Mã voucher (tùy chọn):</label>
-                                                    <input type="text" id="voucherCodeInput" class="form-control" placeholder="Nhập mã voucher">
+                                                    <div class="input-group">
+                                                        <input type="text" id="voucherCodeInput" class="form-control" placeholder="Nhập mã voucher">
+                                                        <div class="input-group-append">
+                                                            <button type="button" class="btn btn-outline-primary" id="applyVoucherBtn" onclick="applyVoucher()">
+                                                                <i class="fas fa-ticket-alt mr-1"></i>Áp mã
+                                                            </button>
+                                                        </div>
+                                                    </div>
                                                 </div>
+                                                <div id="voucherMessage" class="mt-2"></div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="payment-summary">
-                                                    <p><strong>Tổng tiền: ${paymentTotal}đ</strong></p>
-                                                    <p>Giảm giá giờ vàng: ${hourDiscount}đ</p>
+                                                    <p><strong>Tổng tiền: <span id="totalAmountDisplay">${paymentTotal}đ</span></strong></p>
                                                     <p>Giảm giá voucher: <span id="voucherDiscountDisplay">0đ</span></p>
                                                     <hr>
-                                                    <h5><strong>Thành tiền: <span id="finalAmountDisplay">${finalAmount}đ</span></strong></h5>
+                                                    <p><strong>Thành tiền: <span id="finalAmountDisplay">${finalAmount}đ</span></strong></p>
                                                 </div>
                                             </div>
                                         </div>
@@ -627,11 +634,11 @@
                 </div>
 
                 <!-- Thêm JavaScript tùy chỉnh (không AJAX) -->
-                <script src="${pageContext.request.contextPath}/resources/js/menu-no-ajax.js"></script>
+                <script src="${pageContext.request.contextPath}/resources/js/employee/menu-no-ajax.js"></script>
                 <!-- Thêm JavaScript cho modal thanh toán -->
-                <script src="${pageContext.request.contextPath}/resources/js/payment-modal.js"></script>
+                <script src="${pageContext.request.contextPath}/resources/js/employee/payment-modal.js"></script>
                 <!-- Thêm JavaScript cho modal thêm bàn phụ -->
-                <script src="${pageContext.request.contextPath}/resources/js/add-table-modal.js"></script>
+                <script src="${pageContext.request.contextPath}/resources/js/employee/add-table-modal.js"></script>
 
                 <script>
                     // Thiết lập biến đường dẫn gốc cho JavaScript
@@ -700,6 +707,76 @@
                         
                         // Submit form
                         document.getElementById('paymentForm').submit();
+                    }
+
+                    // Hàm áp dụng voucher (sử dụng form submission thay vì AJAX)
+                    function applyVoucher() {
+                        var voucherCode = document.getElementById('voucherCodeInput').value.trim();
+                        
+                        if (!voucherCode) {
+                            document.getElementById('voucherMessage').innerHTML = 
+                                '<div class="alert alert-warning">Vui lòng nhập mã voucher!</div>';
+                            return;
+                        }
+
+                        // Hiển thị loading
+                        var btn = document.getElementById('applyVoucherBtn');
+                        var originalText = btn.innerHTML;
+                        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang kiểm tra...';
+                        btn.disabled = true;
+
+                        // Tạo form ẩn để submit
+                        var form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = contextPath + '/employee/payment/' + currentTableId + '/check-voucher';
+                        form.target = 'voucherFrame';
+                        form.style.display = 'none';
+
+                        var input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'voucherCode';
+                        input.value = voucherCode;
+                        form.appendChild(input);
+
+                        // Tạo iframe ẩn để nhận kết quả
+                        var iframe = document.getElementById('voucherFrame');
+                        if (!iframe) {
+                            iframe = document.createElement('iframe');
+                            iframe.id = 'voucherFrame';
+                            iframe.name = 'voucherFrame';
+                            iframe.style.display = 'none';
+                            document.body.appendChild(iframe);
+                        }
+
+                        iframe.onload = function() {
+                            // Đọc nội dung từ iframe
+                            try {
+                                var result = iframe.contentDocument.body.innerHTML;
+                                document.getElementById('voucherMessage').innerHTML = result;
+                                
+                                // Cập nhật payment summary nếu voucher hợp lệ
+                                var successDiv = iframe.contentDocument.querySelector('.voucher-result.success');
+                                if (successDiv) {
+                                    var voucherDiscount = iframe.contentDocument.querySelector('.voucher-discount');
+                                    var finalAmount = iframe.contentDocument.querySelector('.final-amount');
+                                    
+                                    if (voucherDiscount && finalAmount) {
+                                        document.getElementById('voucherDiscountDisplay').textContent = voucherDiscount.textContent;
+                                        document.getElementById('finalAmountDisplay').textContent = finalAmount.textContent;
+                                    }
+                                }
+                            } catch (e) {
+                                document.getElementById('voucherMessage').innerHTML = 
+                                    '<div class="alert alert-danger">Có lỗi xảy ra khi kiểm tra voucher!</div>';
+                            }
+                            
+                            // Khôi phục nút
+                            btn.innerHTML = originalText;
+                            btn.disabled = false;
+                        };
+
+                        document.body.appendChild(form);
+                        form.submit();
                     }
 
                     // Hàm để toggle hiển thị nội dung order

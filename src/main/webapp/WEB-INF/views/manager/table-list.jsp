@@ -8,8 +8,8 @@
             <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản lý bàn - Hệ thống POS</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/manager-global.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/table-list.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/manager/global.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/manager/table-list.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         </head>
 
@@ -261,7 +261,7 @@
         </div>
     </div>
 
-    <script src="${pageContext.request.contextPath}/resources/js/table-list.js"></script>
+    <script src="${pageContext.request.contextPath}/resources/js/manager/table-list.js"></script>
         </body>
 
         </html>

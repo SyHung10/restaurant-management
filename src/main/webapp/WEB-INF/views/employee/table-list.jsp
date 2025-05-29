@@ -6,9 +6,9 @@
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Quản lý bàn - Nhân viên</title>
-            <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
-            <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/tables.css">
+            <title>Danh sách bàn - POS Nhà hàng</title>
+            <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/common/style.css">
+            <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/employee/tables.css">
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
             <style>
                 .filter-form {
@@ -108,8 +108,7 @@
                                     <select name="floor" id="floor">
                                         <option value="">Tất cả</option>
                                         <c:forEach var="floorOption" items="${floors}">
-                                            <option value="${floorOption}" ${selectedFloor==floorOption ? 'selected'
-                                                : '' }>${floorOption}</option>
+                                            <option value="${floorOption}" ${selectedFloor == floorOption ? 'selected' : ''}>${floorOption}</option>
                                         </c:forEach>
                                     </select>
                                 </div>
@@ -118,8 +117,7 @@
                                     <select name="status" id="status">
                                         <option value="">Tất cả</option>
                                         <c:forEach var="statusOption" items="${statuses}">
-                                            <option value="${statusOption}" ${selectedStatus==statusOption ? 'selected'
-                                                : '' }>${statusOption}</option>
+                                            <option value="${statusOption}" ${selectedStatus == statusOption ? 'selected' : ''}>${statusOption}</option>
                                         </c:forEach>
                                     </select>
                                 </div>
@@ -284,3 +282,6 @@
         </body>
 
         </html>
+
+        <!-- Custom JavaScript -->
+        <script src="${pageContext.request.contextPath}/resources/js/common/script.js"></script>

@@ -84,32 +84,48 @@ public class PaymentController {
                 total = total.add(detail.getPrice().multiply(BigDecimal.valueOf(detail.getQuantity())));
             }
         }
-        // Khuyến mãi giờ vàng
-        BigDecimal hourDiscount = BigDecimal.ZERO;
-        Promotion hourPromo = null;
+        
+        // Khuyến mãi từ session (thường là Happy Hour hoặc promotion tự động)
+        BigDecimal sessionDiscount = BigDecimal.ZERO;
+        Promotion sessionPromo = null;
         if (session.getPromotionId() != null) {
             Promotion promo = promotionService.findById(session.getPromotionId());
-            if (promo != null && "HOUR".equalsIgnoreCase(promo.getType())) {
-                hourPromo = promo;
-                hourDiscount = total.multiply(promo.getDiscountPercent().divide(BigDecimal.valueOf(100)));
+            if (promo != null && promo.isActive()) {
+                sessionPromo = promo;
+                sessionDiscount = promotionService.calculateDiscount(promo, total);
             }
         }
-        // Voucher
+        
+        // Voucher (khuyến mãi theo mã nhập)
         BigDecimal voucherDiscount = BigDecimal.ZERO;
         Promotion voucherPromo = null;
         if (voucherCode != null && !voucherCode.trim().isEmpty()) {
             Promotion promo = promotionService.findByVoucherCode(voucherCode.trim());
-            if (promo != null && "VOUCHER".equalsIgnoreCase(promo.getType())) {
-                voucherPromo = promo;
-                if (promo.getIsPercent() != null && promo.getIsPercent()) {
-                    voucherDiscount = total.multiply(promo.getDiscountPercent().divide(BigDecimal.valueOf(100)));
-                } else {
-                    voucherDiscount = promo.getDiscountValue();
+            if (promo != null && promo.isActive()) {
+                // Kiểm tra xem voucher còn có thể sử dụng được không (chưa vượt max_usage)
+                if (!promotionService.isPromotionUsable(promo.getPromotionId())) {
+                    redirectAttributes.addFlashAttribute("paymentError", "Voucher '" + voucherCode + "' đã hết lượt sử dụng!");
+                    return "redirect:/employee/table/" + tableId + "/menu";
                 }
+                
+                // Tính voucher discount theo scope (ALL/CATEGORY/DISH)
+                voucherDiscount = promotionService.calculateVoucherDiscountByScope(promo, allDetails);
+                
+                // Kiểm tra điều kiện đơn hàng tối thiểu
+                if (voucherDiscount.compareTo(BigDecimal.ZERO) > 0) {
+                    voucherPromo = promo;
+                } else {
+                    redirectAttributes.addFlashAttribute("paymentError", "Voucher '" + voucherCode + "' không áp dụng được cho các món đã chọn hoặc chưa đủ điều kiện tối thiểu!");
+                    return "redirect:/employee/table/" + tableId + "/menu";
+                }
+            } else {
+                redirectAttributes.addFlashAttribute("paymentError", "Mã voucher '" + voucherCode + "' không hợp lệ hoặc đã hết hạn!");
+                return "redirect:/employee/table/" + tableId + "/menu";
             }
         }
+        
         // Tính số tiền cuối cùng
-        BigDecimal finalAmount = total.subtract(hourDiscount).subtract(voucherDiscount);
+        BigDecimal finalAmount = total.subtract(sessionDiscount).subtract(voucherDiscount);
         if (finalAmount.compareTo(BigDecimal.ZERO) < 0)
             finalAmount = BigDecimal.ZERO;
 
@@ -119,15 +135,17 @@ public class PaymentController {
         payment.setSessionId(session.getSessionId());
         payment.setEmployeeId(employee != null ? employee.getEmployeeId() : null);
         payment.setTotalAmount(total);
-        payment.setHourDiscount(hourDiscount);
+        payment.setHourDiscount(sessionDiscount);
         payment.setVoucherDiscount(voucherDiscount);
         payment.setFinalAmount(finalAmount);
         payment.setPaymentMethod(paymentMethod);
         payment.setPaymentTime(new Date());
+        
+        // Ưu tiên voucher trước session promotion
         if (voucherPromo != null) {
             payment.setPromotionId(voucherPromo.getPromotionId());
-        } else if (hourPromo != null) {
-            payment.setPromotionId(hourPromo.getPromotionId());
+        } else if (sessionPromo != null) {
+            payment.setPromotionId(sessionPromo.getPromotionId());
         }
         paymentService.save(payment);
 
@@ -160,6 +178,73 @@ public class PaymentController {
 
     // Method applyVoucher đã được loại bỏ vì không còn sử dụng
     // Voucher được xử lý trực tiếp trong modal thanh toán qua form submission
+    
+    // 4. Kiểm tra voucher trước khi thanh toán
+    @RequestMapping(value = "/{tableId}/check-voucher", method = RequestMethod.POST)
+    public String checkVoucher(
+            @PathVariable("tableId") Long tableId,
+            @RequestParam("voucherCode") String voucherCode,
+            Model model) {
 
+        ServiceSession session = serviceSessionService.findActiveByTableId(tableId);
+        if (session == null) {
+            model.addAttribute("voucherError", "Không tìm thấy phiên phục vụ cho bàn này!");
+            return "employee/voucher-result";
+        }
 
+        List<Order> orders = orderService.findBySessionId(session.getSessionId());
+        List<OrderDetail> allDetails = new ArrayList<>();
+        for (Order order : orders) {
+            allDetails.addAll(orderDetailService.findByOrderId(order.getOrderId()));
+        }
+
+        // Tính tổng tiền các món (không tính món tặng và đã huỷ)
+        BigDecimal total = BigDecimal.ZERO;
+        for (OrderDetail detail : allDetails) {
+            if ((detail.getIsGift() == null || !detail.getIsGift())
+                    && !"CANCELLED".equalsIgnoreCase(detail.getStatus())) {
+                total = total.add(detail.getPrice().multiply(BigDecimal.valueOf(detail.getQuantity())));
+            }
+        }
+
+        // Kiểm tra voucher
+        BigDecimal voucherDiscount = BigDecimal.ZERO;
+        String message = "";
+        boolean isValid = false;
+
+        if (voucherCode != null && !voucherCode.trim().isEmpty()) {
+            Promotion promo = promotionService.findByVoucherCode(voucherCode.trim());
+            if (promo != null && promo.isActive()) {
+                // Kiểm tra xem voucher còn có thể sử dụng được không (chưa vượt max_usage)
+                if (!promotionService.isPromotionUsable(promo.getPromotionId())) {
+                    message = "Voucher '" + voucherCode + "' đã hết lượt sử dụng!";
+                } else {
+                    // Tính voucher discount theo scope (ALL/CATEGORY/DISH)
+                    voucherDiscount = promotionService.calculateVoucherDiscountByScope(promo, allDetails);
+                    
+                    if (voucherDiscount.compareTo(BigDecimal.ZERO) > 0) {
+                        // Voucher hợp lệ
+                        message = "Áp dụng voucher thành công! Giảm " + voucherDiscount + "đ";
+                        isValid = true;
+                    } else {
+                        message = "Voucher '" + voucherCode + "' không áp dụng được cho các món đã chọn hoặc chưa đủ điều kiện tối thiểu!";
+                    }
+                }
+            } else {
+                message = "Mã voucher '" + voucherCode + "' không hợp lệ hoặc đã hết hạn!";
+            }
+        }
+
+        BigDecimal finalAmount = total.subtract(voucherDiscount);
+        if (finalAmount.compareTo(BigDecimal.ZERO) < 0)
+            finalAmount = BigDecimal.ZERO;
+
+        model.addAttribute("isValid", isValid);
+        model.addAttribute("message", message);
+        model.addAttribute("voucherDiscount", voucherDiscount);
+        model.addAttribute("finalAmount", finalAmount);
+        model.addAttribute("total", total);
+
+        return "employee/voucher-result";
+    }
 }

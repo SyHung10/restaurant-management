@@ -1,0 +1,410 @@
+/* ===== MANAGER FORM STYLES ===== */
+
+/* Form Section */
+.form-section {
+    background: white;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-200);
+    overflow: hidden;
+}
+
+.form-header {
+    padding: var(--space-xl);
+    background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.form-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--gray-800);
+    margin-bottom: var(--space-sm);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.form-subtitle {
+    color: var(--gray-600);
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.form-body {
+    padding: var(--space-xl);
+}
+
+/* Form Grid */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--space-lg);
+}
+
+/* Form Groups */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.form-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--gray-700);
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.form-label.required::after {
+    content: '*';
+    color: var(--danger-color);
+    margin-left: var(--space-xs);
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+    padding: 0.75rem;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--border-radius);
+    font-size: 0.875rem;
+    line-height: 1.25;
+    transition: all 0.2s;
+    background-color: white;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.form-input:disabled,
+.form-select:disabled,
+.form-textarea:disabled {
+    background-color: var(--gray-100);
+    color: var(--gray-500);
+    cursor: not-allowed;
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Form Input States */
+.form-input.error,
+.form-select.error {
+    border-color: var(--danger-color);
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.form-input.success,
+.form-select.success {
+    border-color: var(--success-color);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+/* Form Help Text */
+.form-help {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+    margin-top: var(--space-xs);
+}
+
+.form-error {
+    font-size: 0.75rem;
+    color: var(--danger-color);
+    margin-top: var(--space-xs);
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+/* Form Actions */
+.form-actions {
+    display: flex;
+    gap: var(--space-md);
+    padding-top: var(--space-xl);
+    border-top: 1px solid var(--gray-200);
+    margin-top: var(--space-xl);
+}
+
+.form-actions .btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+/* File Input Styling */
+.form-file-input {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    width: 100%;
+}
+
+.form-file-input input[type="file"] {
+    position: absolute;
+    left: -9999px;
+}
+
+.form-file-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: 0.75rem;
+    border: 2px dashed var(--gray-300);
+    border-radius: var(--border-radius);
+    color: var(--gray-600);
+    background-color: var(--gray-50);
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.form-file-label:hover {
+    border-color: var(--primary-color);
+    background-color: rgba(37, 99, 235, 0.05);
+    color: var(--primary-color);
+}
+
+/* Checkbox and Radio Styling */
+.form-checkbox,
+.form-radio {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    cursor: pointer;
+}
+
+.form-checkbox input[type="checkbox"],
+.form-radio input[type="radio"] {
+    width: 1rem;
+    height: 1rem;
+    accent-color: var(--primary-color);
+}
+
+/* Switch Styling */
+.form-switch {
+    position: relative;
+    display: inline-block;
+    width: 3rem;
+    height: 1.5rem;
+}
+
+.form-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.form-switch-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--gray-300);
+    transition: 0.3s;
+    border-radius: 1.5rem;
+}
+
+.form-switch-slider:before {
+    position: absolute;
+    content: "";
+    height: 1.125rem;
+    width: 1.125rem;
+    left: 0.1875rem;
+    bottom: 0.1875rem;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+}
+
+.form-switch input:checked + .form-switch-slider {
+    background-color: var(--primary-color);
+}
+
+.form-switch input:checked + .form-switch-slider:before {
+    transform: translateX(1.5rem);
+}
+
+/* Form Layout Utilities */
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-md);
+}
+
+.form-col-1 { grid-column: span 1; }
+.form-col-2 { grid-column: span 2; }
+.form-col-full { grid-column: 1 / -1; }
+
+/* Responsive Form */
+@media (max-width: 768px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-md);
+    }
+    
+    .form-header {
+        padding: var(--space-lg);
+    }
+    
+    .form-body {
+        padding: var(--space-lg);
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .form-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-col-1,
+    .form-col-2 {
+        grid-column: span 1;
+    }
+}
+
+/* Form Validation Styling */
+.form-validation-summary {
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: var(--border-radius);
+    padding: var(--space-md);
+    margin-bottom: var(--space-lg);
+}
+
+.form-validation-summary h4 {
+    color: var(--danger-color);
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: var(--space-sm);
+}
+
+.form-validation-summary ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.form-validation-summary li {
+    color: var(--danger-color);
+    font-size: 0.75rem;
+    margin-bottom: var(--space-xs);
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+/* Loading States */
+.form-loading {
+    position: relative;
+    overflow: hidden;
+}
+
+.form-loading::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+    animation: form-loading 1.5s infinite;
+}
+
+@keyframes form-loading {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+/* Form Success State */
+.form-success {
+    background-color: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: var(--border-radius);
+    padding: var(--space-md);
+    margin-bottom: var(--space-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    color: var(--success-color);
+}
+
+/* Input Groups */
+.input-group {
+    display: flex;
+    width: 100%;
+}
+
+.input-group .form-input {
+    border-radius: 0;
+    border-right: 0;
+}
+
+.input-group .form-input:first-child {
+    border-top-left-radius: var(--border-radius);
+    border-bottom-left-radius: var(--border-radius);
+}
+
+.input-group .form-input:last-child {
+    border-top-right-radius: var(--border-radius);
+    border-bottom-right-radius: var(--border-radius);
+    border-right: 1px solid var(--gray-300);
+}
+
+.input-group-addon {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    background-color: var(--gray-100);
+    border: 1px solid var(--gray-300);
+    border-left: 0;
+    border-top-right-radius: var(--border-radius);
+    border-bottom-right-radius: var(--border-radius);
+    font-size: 0.875rem;
+    color: var(--gray-600);
+}
+
+/* Floating Labels */
+.floating-label {
+    position: relative;
+}
+
+.floating-label .form-input {
+    padding-top: 1.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.floating-label .form-label {
+    position: absolute;
+    left: 0.75rem;
+    top: 0.75rem;
+    font-size: 0.875rem;
+    color: var(--gray-500);
+    transition: all 0.2s;
+    pointer-events: none;
+    background-color: white;
+    padding: 0 0.25rem;
+}
+
+.floating-label .form-input:focus + .form-label,
+.floating-label .form-input:not(:placeholder-shown) + .form-label {
+    transform: translateY(-1.5rem) scale(0.85);
+    color: var(--primary-color);
+} 

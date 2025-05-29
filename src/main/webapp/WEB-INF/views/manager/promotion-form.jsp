@@ -7,9 +7,10 @@
             <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${promotion.promotionId == null ? 'Thêm khuyến mãi mới' : 'Chỉnh sửa khuyến mãi'} - Hệ thống POS</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/manager-global.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/promotion-form.css">
+    <title>${promotion.promotionId == null ? 'Thêm mới' : 'Chỉnh sửa'} khuyến mãi - Nhà hàng</title>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/manager/global.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/manager/form.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/manager/promotion-form.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
             </head>
 
@@ -66,17 +67,12 @@
             <!-- Header -->
             <div class="manager-header">
                 <div class="page-header">
-                    <h1 class="page-title">
-                        <i class="fas fa-percent mr-2"></i>
-                        ${promotion.promotionId == null ? 'Thêm khuyến mãi mới' : 'Chỉnh sửa khuyến mãi'}
-                    </h1>
-                    <p class="page-subtitle">
-                        ${promotion.promotionId == null ? 'Tạo chương trình khuyến mãi mới' : 'Cập nhật thông tin khuyến mãi'}
-                    </p>
+                    <h1 class="page-title">${promotion.promotionId == null ? 'Thêm mới' : 'Chỉnh sửa'} khuyến mãi</h1>
+                    <p class="page-subtitle">${promotion.promotionId == null ? 'Tạo chương trình khuyến mãi mới' : 'Cập nhật thông tin khuyến mãi'}</p>
                 </div>
                 <div class="header-actions">
                     <a href="${pageContext.request.contextPath}/manager/promotions" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left"></i>
+                        <i class="fas fa-arrow-left mr-1"></i>
                         <span>Quay lại danh sách</span>
                     </a>
                 </div>
@@ -84,12 +80,27 @@
 
             <!-- Content -->
             <div class="manager-content">
+                <!-- Flash messages -->
+                <c:if test="${not empty error}">
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        ${error}
+                    </div>
+                </c:if>
+                
+                <c:if test="${not empty success}">
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle mr-2"></i>
+                        ${success}
+                    </div>
+                </c:if>
+                
                 <div class="form-section">
                     <div class="form-header">
                         <h2 class="form-title">
                             <i class="fas fa-${promotion.promotionId == null ? 'plus-circle' : 'edit'} mr-2"></i>
                             ${promotion.promotionId == null ? 'Thông tin khuyến mãi mới' : 'Chỉnh sửa thông tin khuyến mãi'}
-                </h2>
+                        </h2>
                         <p class="form-subtitle">
                             ${promotion.promotionId == null ? 'Vui lòng điền đầy đủ thông tin để tạo khuyến mãi mới' : 'Cập nhật thông tin khuyến mãi trong hệ thống'}
                         </p>
@@ -98,6 +109,7 @@
                     <div class="form-body">
                         <form id="promotionForm" action="${pageContext.request.contextPath}/manager/promotions/save" method="post">
                             <input type="hidden" name="promotionId" value="${promotion.promotionId}">
+                            <input type="hidden" name="isPercent" id="isPercent" value="${promotion.isPercent}">
                             
                             <div class="form-grid">
                                 <div class="form-group">
@@ -130,15 +142,41 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label class="form-label required" for="type">
-                                        <i class="fas fa-percentage mr-1"></i>
-                                        Loại khuyến mãi
+                                    <label class="form-label required" for="scopeType">
+                                        <i class="fas fa-bullseye mr-1"></i>
+                                        Phạm vi áp dụng
                                     </label>
-                                    <select id="type" name="type" class="form-select" required>
-                                        <option value="">Chọn loại khuyến mãi</option>
-                                        <option value="VOUCHER" ${promotion.type == 'VOUCHER' ? 'selected' : ''}>Voucher khuyến mãi</option>
-                                        <option value="HOUR" ${promotion.type == 'HOUR' ? 'selected' : ''}>Khuyến mãi giờ vàng</option>
-                                </select>
+                                    <select id="scopeType" name="scopeType" class="form-select" required onchange="toggleTargetId()">
+                                        <option value="ALL" ${promotion.scopeType == 'ALL' ? 'selected' : ''}>Tất cả món ăn</option>
+                                        <option value="CATEGORY" ${promotion.scopeType == 'CATEGORY' ? 'selected' : ''}>Theo danh mục</option>
+                                        <option value="DISH" ${promotion.scopeType == 'DISH' ? 'selected' : ''}>Theo món ăn</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group" id="targetIdGroup">
+                    <c:choose>
+                                        <c:when test="${promotion.scopeType != 'ALL'}">
+                                            <style>
+                                                #targetIdGroup { display: block; }
+                                            </style>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <style>
+                                                #targetIdGroup { display: none; }
+                                            </style>
+                                        </c:otherwise>
+                    </c:choose>
+                                    <label class="form-label" for="targetId">
+                                        <i class="fas fa-target mr-1"></i>
+                                        ID đối tượng
+                                    </label>
+                                    <input type="number" 
+                                           id="targetId"
+                                           name="targetId" 
+                                           value="${promotion.targetId}" 
+                                           min="1"
+                                           class="form-input" 
+                                           placeholder="ID danh mục hoặc món ăn">
                                 </div>
 
                                 <div class="form-group">
@@ -154,7 +192,8 @@
                                            min="0"
                                            max="100"
                                            class="form-input" 
-                                           placeholder="VD: 20.5">
+                                           placeholder="VD: 20.5"
+                                           onchange="updateDiscountType('percent')">
                                 </div>
 
                                 <div class="form-group">
@@ -169,56 +208,52 @@
                                            step="1000"
                                            min="0"
                                            class="form-input" 
-                                           placeholder="VD: 50000">
+                                           placeholder="VD: 50000"
+                                           onchange="updateDiscountType('value')">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label" for="orderMinimum">
+                                        <i class="fas fa-shopping-cart mr-1"></i>
+                                        Giá trị đơn hàng tối thiểu
+                                    </label>
+                                    <input type="number" 
+                                           id="orderMinimum"
+                                           name="orderMinimum" 
+                                           value="${promotion.orderMinimum}" 
+                                           step="1000"
+                                           min="0"
+                                           class="form-input" 
+                                           placeholder="VD: 100000">
                                 </div>
 
                                 <div class="form-group">
                                     <label class="form-label" for="startTime">
-                                        <i class="fas fa-clock mr-1"></i>
-                                        Giờ bắt đầu
+                                        <i class="fas fa-calendar-plus mr-1"></i>
+                                        Thời gian bắt đầu
                                     </label>
-                                    <div class="datetime-input">
-                                        <input type="time" 
-                                               id="startTime"
-                                               name="startTime" 
-                                               value="${promotion.startTime}" 
-                                               class="form-input"
-                                               placeholder="VD: 14:00">
-                                        <i class="fas fa-clock datetime-icon"></i>
-                                    </div>
+                                    <input type="datetime-local" 
+                                           id="startTime"
+                                           name="startTime" 
+                                           value="<fmt:formatDate value='${promotion.startTime}' pattern='yyyy-MM-dd&apos;T&apos;HH:mm'/>" 
+                                           class="form-input">
                                 </div>
 
                                 <div class="form-group">
                                     <label class="form-label" for="endTime">
-                                        <i class="fas fa-clock mr-1"></i>
-                                        Giờ kết thúc
-                                    </label>
-                                    <div class="datetime-input">
-                                        <input type="time" 
-                                               id="endTime"
-                                               name="endTime" 
-                                               value="${promotion.endTime}" 
-                                               class="form-input"
-                                               placeholder="VD: 16:00">
-                                        <i class="fas fa-clock datetime-icon"></i>
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="form-label" for="expiryDate">
                                         <i class="fas fa-calendar-times mr-1"></i>
-                                        Ngày hết hạn
+                                        Thời gian kết thúc
                                     </label>
-                                    <input type="date" 
-                                           id="expiryDate"
-                                           name="expiryDate" 
-                                           value="<fmt:formatDate value='${promotion.expiryDate}' pattern='yyyy-MM-dd'/>" 
+                                    <input type="datetime-local" 
+                                           id="endTime"
+                                           name="endTime" 
+                                           value="<fmt:formatDate value='${promotion.endTime}' pattern='yyyy-MM-dd&apos;T&apos;HH:mm'/>" 
                                            class="form-input">
                                 </div>
 
                                 <div class="form-group">
                                     <label class="form-label" for="maxUsage">
-                                        <i class="fas fa-users mr-1"></i>
+                                        <i class="fas fa-user-check mr-1"></i>
                                         Số lần sử dụng tối đa
                                     </label>
                                     <input type="number" 
@@ -226,26 +261,8 @@
                                            name="maxUsage" 
                                            value="${promotion.maxUsage}" 
                                            min="1"
-                                           class="form-input"
+                                           class="form-input" 
                                            placeholder="VD: 100">
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="form-label">
-                                        <i class="fas fa-check-square mr-1"></i>
-                                        Loại giảm giá
-                                    </label>
-                                    <div class="checkbox-wrapper">
-                                        <label class="checkbox-label">
-                                            <input type="checkbox" 
-                                                   id="isPercent"
-                                                   name="isPercent" 
-                                                   value="true"
-                                                   ${promotion.isPercent ? 'checked' : ''}>
-                                            <span class="checkbox-custom"></span>
-                                            <span>Giảm theo phần trăm</span>
-                                        </label>
-                                    </div>
                                 </div>
 
                                 <div class="form-group">
@@ -260,60 +277,15 @@
                                 </div>
                             </div>
 
-                            <!-- Description -->
-                            <div class="form-group full-width">
-                                <label class="form-label" for="description">
-                                    <i class="fas fa-align-left mr-1"></i>
-                                    Mô tả chi tiết
-                                </label>
-                                <textarea id="description"
-                                         name="description" 
-                                         class="form-textarea" 
-                                         rows="4"
-                                         placeholder="Mô tả chi tiết về chương trình khuyến mãi, điều kiện áp dụng..."></textarea>
-                            </div>
-
-                            <!-- Promotion Preview -->
-                            <div class="form-group full-width">
-                                <label class="form-label">
-                                    <i class="fas fa-eye mr-1"></i>
-                                    Xem trước loại khuyến mãi
-                                </label>
-                                <div class="promotion-preview">
-                                    <div class="promotion-card promo-voucher">
-                                        <div class="font-semibold">
-                                            <i class="fas fa-ticket-alt mr-1"></i>
-                                            Voucher khuyến mãi
-                                        </div>
-                                        <div class="text-xs text-gray-600 mt-1">
-                                            Mã voucher có thể giảm theo % hoặc số tiền cố định. VD: Mã SAVE20 giảm 20% hoặc giảm 50,000đ
-                                        </div>
-                                    </div>
-                                    <div class="promotion-card promo-hour">
-                                        <div class="font-semibold">
-                                            <i class="fas fa-clock mr-1"></i>
-                                            Khuyến mãi giờ vàng
-                                        </div>
-                                        <div class="text-xs text-gray-600 mt-1">
-                                            Khuyến mãi theo khung giờ cụ thể trong ngày. VD: Giảm 30% từ 14h-16h hàng ngày
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
                             <div class="form-actions">
-                                <div>
-                                    <a href="${pageContext.request.contextPath}/manager/promotions" class="btn btn-secondary">
-                                        <i class="fas fa-times mr-1"></i>
-                                        <span>Hủy bỏ</span>
-                                    </a>
-                                </div>
-                                <div>
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-save mr-1"></i>
-                                        <span>${promotion.promotionId == null ? 'Tạo khuyến mãi' : 'Cập nhật khuyến mãi'}</span>
-                                    </button>
-                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save mr-1"></i>
+                                    <span>${promotion.promotionId == null ? 'Tạo khuyến mãi' : 'Cập nhật khuyến mãi'}</span>
+                                </button>
+                                <a href="${pageContext.request.contextPath}/manager/promotions" class="btn btn-secondary">
+                                    <i class="fas fa-times mr-1"></i>
+                                    <span>Hủy bỏ</span>
+                                </a>
                             </div>
                 </form>
                     </div>
@@ -322,7 +294,7 @@
         </div>
     </div>
 
-    <script src="${pageContext.request.contextPath}/resources/js/promotion-form.js"></script>
+    <script src="${pageContext.request.contextPath}/resources/js/manager/promotion-form.js"></script>
             </body>
 
             </html>

@@ -7,7 +7,7 @@
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Đăng nhập - Hệ thống POS Nhà hàng</title>
-            <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/login.css">
+            <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/common/login.css">
             <link rel="preconnect" href="https://fonts.googleapis.com">
             <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         </head>

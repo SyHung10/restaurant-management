@@ -629,3 +629,157 @@
         padding: 0 0 15px 0;
     }
 }
+
+/* CSS cho voucher input và message */
+.voucher-input-group {
+    margin-bottom: 15px;
+}
+
+#voucherMessage {
+    margin-top: 10px;
+}
+
+#voucherMessage .alert {
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    margin-bottom: 0;
+}
+
+#voucherMessage .voucher-result {
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #dee2e6;
+}
+
+#voucherMessage .voucher-result.success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+#voucherMessage .voucher-result.error {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+#voucherMessage .voucher-info {
+    margin-top: 8px;
+    font-size: 0.9rem;
+}
+
+#voucherMessage .voucher-info p {
+    margin-bottom: 4px;
+}
+
+#voucherMessage .voucher-info hr {
+    margin: 8px 0;
+    border-top: 1px solid #adb5bd;
+}
+
+/* Đảm bảo input có chiều cao tương ứng */
+#voucherCodeInput {
+    height: 38px !important;
+    padding: 6px 12px !important;
+    font-size: 0.9rem !important;
+    line-height: 1.5 !important;
+    border: 1px solid #ced4da !important;
+    box-sizing: border-box !important;
+}
+
+/* Style cho nút áp mã */
+#applyVoucherBtn {
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+    white-space: nowrap !important;
+    height: 38px !important; /* Cùng chiều cao với input */
+    padding: 6px 12px !important;
+    line-height: 1.5 !important;
+    font-size: 0.9rem !important;
+    font-weight: 500 !important;
+    border: 1px solid #007bff !important;
+    background-color: #007bff !important;
+    color: white !important;
+    transition: all 0.2s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 80px !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+}
+
+#applyVoucherBtn:hover {
+    background-color: #0056b3 !important;
+    border-color: #0056b3 !important;
+    transform: none !important;
+}
+
+#applyVoucherBtn:focus {
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25) !important;
+    outline: none !important;
+}
+
+#applyVoucherBtn:disabled {
+    opacity: 0.6 !important;
+    cursor: not-allowed !important;
+    background-color: #6c757d !important;
+    border-color: #6c757d !important;
+}
+
+#applyVoucherBtn .fa-spinner {
+    animation: spin 1s linear infinite !important;
+}
+
+#applyVoucherBtn i {
+    font-size: 0.8rem !important;
+    margin-right: 4px !important;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Input group styling */
+.input-group {
+    display: flex !important;
+    position: relative !important;
+    width: 100% !important;
+    align-items: stretch !important; /* Đảm bảo các element có cùng chiều cao */
+}
+
+.input-group .form-control {
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    border-right: none !important;
+    flex: 1 !important;
+    position: relative !important;
+    z-index: 2 !important;
+    margin-bottom: 0 !important; /* Loại bỏ margin bottom mặc định */
+}
+
+.input-group-append {
+    display: flex !important;
+    margin-left: -1px !important;
+    align-items: stretch !important; /* Đảm bảo button stretch full height */
+}
+
+.input-group-append .btn {
+    position: relative !important;
+    z-index: 2 !important;
+    margin-bottom: 0 !important; /* Loại bỏ margin bottom mặc định */
+}
+
+.input-group .form-control:focus {
+    z-index: 3 !important;
+    border-color: #007bff !important;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25) !important;
+}
+
+/* Đảm bảo nút có cùng chiều cao với input */
+.input-group-append .btn {
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+}

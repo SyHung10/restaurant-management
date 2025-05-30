@@ -1,3 +1,25 @@
+# Ignore everything except src directory
+/*
+!/src/
+!.gitignore
+
+# But still ignore these common files in src if they exist
+src/**/*.class
+src/**/*.log
+src/**/*.tmp
+src/**/*.bak
+src/**/*.swp
+src/**/*~
+
+# OS specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
 # Eclipse specific files
 .metadata
 bin/
@@ -89,15 +111,6 @@ dist/
 
 # Virtual machine crash logs
 hs_err_pid*
-
-# OS specific files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
 
 # IDE specific files
 *.iml

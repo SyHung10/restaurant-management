@@ -111,7 +111,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                 <tbody>
                   <c:forEach var="menu" items="${menus}">
                     <tr>
-                      <td style="width:60px;"><img src="${menu.imageUrl}" alt="${menu.name}" style="width:100%; height:auto; object-fit:cover; border-radius:6px;"/></td>
+                      <td style="width:60px;"><img src="${pageContext.request.contextPath}${menu.imageUrl}" alt="${menu.name}" style="width:100%; height:auto; object-fit:cover; border-radius:6px;"/></td>
                       <td>${menu.name}</td>
                       <td>${menu.category.name}</td>
                       <td><fmt:formatNumber value="${menu.price}" type="currency" currencySymbol="₫"/></td>

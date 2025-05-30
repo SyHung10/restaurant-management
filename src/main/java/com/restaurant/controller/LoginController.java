@@ -28,6 +28,12 @@ public class LoginController {
             HttpSession session) {
         Employee employee = employeeService.findByUsernameAndPassword(username, password);
         if (employee != null) {
+            // Kiểm tra trạng thái tài khoản
+            if (!"ACTIVE".equalsIgnoreCase(employee.getStatus())) {
+                model.addAttribute("error", "Tài khoản đã bị khóa! Vui lòng liên hệ quản lý.");
+                return "login";
+            }
+            
             session.setAttribute("loggedInUser", employee);
             if ("MANAGER".equalsIgnoreCase(employee.getRole())) {
                 return "redirect:/manager/dashboard";

@@ -55,6 +55,15 @@ uri="http://java.sun.com/jsp/jstl/core" %>
           </div>
           <div class="sidebar-nav-item">
             <a
+              href="${pageContext.request.contextPath}/manager/categories"
+              class="sidebar-nav-link"
+            >
+              <i class="fas fa-tags sidebar-nav-icon"></i>
+              <span>Quản lý danh mục</span>
+            </a>
+          </div>
+          <div class="sidebar-nav-item">
+            <a
               href="${pageContext.request.contextPath}/manager/employees"
               class="sidebar-nav-link active"
             >
@@ -78,6 +87,15 @@ uri="http://java.sun.com/jsp/jstl/core" %>
             >
               <i class="fas fa-chart-bar sidebar-nav-icon"></i>
               <span>Báo cáo</span>
+            </a>
+          </div>
+          <div class="sidebar-nav-item logout-item" style="margin-top: auto">
+            <a
+              href="${pageContext.request.contextPath}/logout"
+              class="sidebar-nav-link"
+            >
+              <i class="fas fa-sign-out-alt sidebar-nav-icon"></i>
+              <span>Đăng xuất</span>
             </a>
           </div>
         </nav>
@@ -115,10 +133,10 @@ uri="http://java.sun.com/jsp/jstl/core" %>
         <!-- Content -->
         <div class="manager-content">
           <!-- Stats Cards -->
-          <div class="grid grid-cols-4 mb-xl">
+          <div class="stats-grid">
             <div class="card">
               <div class="card-body text-center">
-                <div class="text-2xl font-bold text-gray-900">
+                <div class="text-2xl font-bold text-primary-color">
                   ${employees.size()}
                 </div>
                 <div class="text-sm text-gray-600">Tổng nhân viên</div>
@@ -126,7 +144,7 @@ uri="http://java.sun.com/jsp/jstl/core" %>
             </div>
             <div class="card">
               <div class="card-body text-center">
-                <div class="text-2xl font-bold text-gray-900">
+                <div class="text-2xl font-bold text-info-color">
                   <c:set var="managerCount" value="0" />
                   <c:forEach var="employee" items="${employees}">
                     <c:if test="${employee.role == 'MANAGER'}">
@@ -140,7 +158,7 @@ uri="http://java.sun.com/jsp/jstl/core" %>
             </div>
             <div class="card">
               <div class="card-body text-center">
-                <div class="text-2xl font-bold text-gray-900">
+                <div class="text-2xl font-bold text-warning-color">
                   <c:set var="employeeCount" value="0" />
                   <c:forEach var="employee" items="${employees}">
                     <c:if test="${employee.role == 'EMPLOYEE'}">
@@ -154,16 +172,30 @@ uri="http://java.sun.com/jsp/jstl/core" %>
             </div>
             <div class="card">
               <div class="card-body text-center">
-                <div class="text-2xl font-bold text-gray-900">
-                  <c:set var="adminCount" value="0" />
+                <div class="text-2xl font-bold text-success-color">
+                  <c:set var="activeCount" value="0" />
                   <c:forEach var="employee" items="${employees}">
-                    <c:if test="${employee.role == 'ADMIN'}">
-                      <c:set var="adminCount" value="${adminCount + 1}" />
+                    <c:if test="${employee.status == 'ACTIVE'}">
+                      <c:set var="activeCount" value="${activeCount + 1}" />
                     </c:if>
                   </c:forEach>
-                  ${adminCount}
+                  ${activeCount}
                 </div>
-                <div class="text-sm text-gray-600">Admin</div>
+                <div class="text-sm text-gray-600">Hoạt động</div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-body text-center">
+                <div class="text-2xl font-bold text-danger-color">
+                  <c:set var="inactiveCount" value="0" />
+                  <c:forEach var="employee" items="${employees}">
+                    <c:if test="${employee.status == 'INACTIVE'}">
+                      <c:set var="inactiveCount" value="${inactiveCount + 1}" />
+                    </c:if>
+                  </c:forEach>
+                  ${inactiveCount}
+                </div>
+                <div class="text-sm text-gray-600">Đã khóa</div>
               </div>
             </div>
           </div>
@@ -262,10 +294,26 @@ uri="http://java.sun.com/jsp/jstl/core" %>
                         </div>
                       </td>
                       <td>
-                        <span class="badge badge-success">
-                          <i class="fas fa-check-circle"></i>
-                          <span>Hoạt động</span>
-                        </span>
+                        <c:choose>
+                          <c:when test="${employee.status == 'ACTIVE'}">
+                            <span class="badge badge-success">
+                              <i class="fas fa-check-circle"></i>
+                              <span>Hoạt động</span>
+                            </span>
+                          </c:when>
+                          <c:when test="${employee.status == 'INACTIVE'}">
+                            <span class="badge badge-danger">
+                              <i class="fas fa-times-circle"></i>
+                              <span>Đã khóa</span>
+                            </span>
+                          </c:when>
+                          <c:otherwise>
+                            <span class="badge badge-gray">
+                              <i class="fas fa-question-circle"></i>
+                              <span>${employee.status}</span>
+                            </span>
+                          </c:otherwise>
+                        </c:choose>
                       </td>
                       <td>
                         <div class="flex gap-sm">

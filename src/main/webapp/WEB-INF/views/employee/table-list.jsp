@@ -71,12 +71,6 @@
             </div>
             <nav class="sidebar-nav">
                 <div class="sidebar-nav-item">
-                    <a href="${pageContext.request.contextPath}/employee/dashboard" class="sidebar-nav-link">
-                        <i class="fas fa-chart-line sidebar-nav-icon"></i>
-                        <span>Tổng quan</span>
-                    </a>
-                </div>
-                <div class="sidebar-nav-item">
                     <a href="${pageContext.request.contextPath}/employee/table/list" class="sidebar-nav-link active">
                         <i class="fas fa-table sidebar-nav-icon"></i>
                         <span>Quản lý bàn</span>

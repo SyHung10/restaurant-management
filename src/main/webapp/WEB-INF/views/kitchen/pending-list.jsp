@@ -85,7 +85,7 @@ uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib prefix="fmt" uri="http://j
       .order-table tr.order-row:hover { background: #f5f7fa; }
       .order-table tr.order-row.active-row { background: #e6f0fa; }
       .order-detail-container { box-shadow:0 2px 12px 0 rgba(80,120,200,0.08); }
-      .order-filter { max-width: 420px; margin-bottom: 18px; }
+      .order-filter { max-width: 100%; margin-bottom: 18px; }
       @media (max-width: 900px) { .order-filter { max-width:100%; } }
       .dropdown { position: relative; display: inline-block; }
       .dropdown-content {
@@ -160,6 +160,13 @@ uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib prefix="fmt" uri="http://j
       .order-detail-table td.id-col {
         padding-left: 16px;
       }
+      /* Cancel modal improvements */
+      .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+      .modal-header h3 { margin: 0; font-size: 1.2em; }
+      .modal-body { padding: 0 0 12px; }
+      .modal-footer { text-align: right; }
+      .btn-secondary { background: #6c757d; color: #fff; border: none; border-radius: 7px; padding: 7px 20px; margin-right: 8px; }
+      .btn-danger { background: #dc3545; color: #fff; border: none; border-radius: 7px; padding: 7px 20px; }
     </style>
   </head>
   <body>
@@ -173,7 +180,7 @@ uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib prefix="fmt" uri="http://j
         <nav class="sidebar-nav">
           <div class="sidebar-nav-item">
             <a
-              href="${pageContext.request.contextPath}/kitchen/kanban"
+              href="${pageContext.request.contextPath}/kitchen/kanban?fromDate=${fromDate}&toDate=${toDate}&filterStatus=${filterStatus}"
               class="sidebar-nav-link active"
             >
               <i class="fas fa-receipt sidebar-nav-icon"></i>
@@ -230,12 +237,55 @@ uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib prefix="fmt" uri="http://j
               <div class="overview-value">${cancelledCount}</div>
             </div>
           </div>
-          <!-- Filter date range -->
+          <!-- Filter date range and order status -->
           <form method="get" class="order-filter" action="${pageContext.request.contextPath}/kitchen/kanban">
             <label>Từ:</label>
             <input type="date" name="fromDate" value="${fromDate}" style="height:36px;"/>
             <label>Đến:</label>
             <input type="date" name="toDate" value="${toDate}" style="height:36px;"/>
+            <label>Trạng thái:</label>
+            <select name="filterStatus" style="padding:6px 12px; border-radius:7px;">
+              <c:choose>
+                <c:when test="${empty filterStatus}">
+                  <option value="" selected>Tất cả</option>
+                </c:when>
+                <c:otherwise>
+                  <option value="">Tất cả</option>
+                </c:otherwise>
+              </c:choose>
+              <c:choose>
+                <c:when test="${filterStatus=='PENDING'}">
+                  <option value="PENDING" selected>PENDING</option>
+                </c:when>
+                <c:otherwise>
+                  <option value="PENDING">PENDING</option>
+                </c:otherwise>
+              </c:choose>
+              <c:choose>
+                <c:when test="${filterStatus=='PROCESSING'}">
+                  <option value="PROCESSING" selected>PROCESSING</option>
+                </c:when>
+                <c:otherwise>
+                  <option value="PROCESSING">PROCESSING</option>
+                </c:otherwise>
+              </c:choose>
+              <c:choose>
+                <c:when test="${filterStatus=='SERVED'}">
+                  <option value="SERVED" selected>SERVED</option>
+                </c:when>
+                <c:otherwise>
+                  <option value="SERVED">SERVED</option>
+                </c:otherwise>
+              </c:choose>
+              <c:choose>
+                <c:when test="${filterStatus=='CANCELLED'}">
+                  <option value="CANCELLED" selected>CANCELLED</option>
+                </c:when>
+                <c:otherwise>
+                  <option value="CANCELLED">CANCELLED</option>
+                </c:otherwise>
+              </c:choose>
+            </select>
             <button type="submit" class="btn" style="height:36px;padding:0 14px;">Lọc</button>
           </form>
           <!-- Order Table -->
@@ -262,7 +312,7 @@ uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib prefix="fmt" uri="http://j
                       <input type="hidden" name="fromDate" value="${fromDate}"/>
                       <input type="hidden" name="toDate" value="${toDate}"/>
                       <div class="dropdown">
-                        <button type="button" class="badge-status badge-${order.status.toLowerCase()} pastel-badge" onclick="toggleStatusDropdown(event, ${order.orderId})">
+                        <button type="button" class="badge-status badge-${order.status.toLowerCase()} pastel-badge" onclick="toggleStatusDropdown(event, '${order.orderId}')">
                           ${order.status} <i class="fa fa-caret-down"></i>
                         </button>
                         <div class="dropdown-content" id="status-dropdown-${order.orderId}">
@@ -307,12 +357,12 @@ uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib prefix="fmt" uri="http://j
                               <td><fmt:formatNumber value='${item.menu.price}' type='currency' currencySymbol='₫'/></td>
                               <td>
                                 <form action="${pageContext.request.contextPath}/kitchen/orderDetail/${item.orderDetail.orderDetailId}/change-status" method="post" style="display:inline;">
-                                  <input type="hidden" name="dateType" value="${selectedDateType}"/>
-                                  <input type="hidden" name="specificDate" value="${selectedDate}"/>
+                                  <input type="hidden" name="fromDate" value="${fromDate}"/>
+                                  <input type="hidden" name="toDate" value="${toDate}"/>
                                   <div class="dropdown">
                                     <select class="badge-status badge-${item.orderDetail.status.toLowerCase()} pastel-badge"
                                             name="status"
-                                            onchange="handleStatusChange(event, '${item.orderDetail.orderDetailId}', this.form, '${selectedDateType}', '${selectedDate}')">
+                                            onchange="handleStatusChange(event, '${item.orderDetail.orderDetailId}', this.form, '${fromDate}', '${toDate}')">
                                       <option value="PENDING" ${item.orderDetail.status == 'PENDING' ? 'selected' : ''}>PENDING</option>
                                       <option value="PROCESSING" ${item.orderDetail.status == 'PROCESSING' ? 'selected' : ''}>PROCESSING</option>
                                       <option value="SERVED" ${item.orderDetail.status == 'SERVED' ? 'selected' : ''}>SERVED</option>
@@ -335,16 +385,20 @@ uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib prefix="fmt" uri="http://j
           <!-- Modal nhập lý do hủy -->
           <div id="cancelModal" class="modal" style="display:none;">
             <div class="modal-content">
-              <span class="close" onclick="closeCancelModal()">&times;</span>
-              <h3>Lý do hủy món</h3>
+              <div class="modal-header">
+                <h3>Lý do hủy món</h3>
+                <span class="close" onclick="closeCancelModal()">&times;</span>
+              </div>
               <form id="cancelForm" method="post">
-                <input type="hidden" name="dateType" id="modalDateType" />
-                <input type="hidden" name="specificDate" id="modalSpecificDate" />
-                <input type="hidden" name="status" value="CANCELLED" />
-                <textarea name="reason" id="cancelReason" rows="3" style="width:100%;" required></textarea>
-                <div style="margin-top:12px; text-align:right;">
-                  <button type="button" onclick="closeCancelModal()" style="margin-right:8px;">Đóng</button>
-                  <button type="submit" class="btn">Xác nhận</button>
+                <div class="modal-body">
+                  <input type="hidden" name="fromDate" id="modalDateType" />
+                  <input type="hidden" name="toDate" id="modalSpecificDate" />
+                  <input type="hidden" name="status" value="CANCELLED" />
+                  <textarea name="reason" id="cancelReason" rows="3" style="width:100%;" required></textarea>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn-secondary" onclick="closeCancelModal()">Đóng</button>
+                  <button type="submit" class="btn-danger">Xác nhận</button>
                 </div>
               </form>
             </div>

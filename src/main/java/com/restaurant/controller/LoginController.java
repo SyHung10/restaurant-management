@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpSession;
+import java.time.LocalDate;
 
 @Controller
 public class LoginController {
@@ -32,8 +33,9 @@ public class LoginController {
             if ("MANAGER".equalsIgnoreCase(employee.getRole())) {
                 return "redirect:/manager/dashboard";
             } else if ("KITCHEN".equalsIgnoreCase(employee.getRole())) {
-                // Nếu là nhân viên bếp thì vào trang món chờ chế biến
-                return "redirect:/kitchen/pending";
+                // Nếu là nhân viên bếp thì vào trang Kanban (đơn hàng) với filter ngày hôm nay
+                String today = LocalDate.now().toString();
+                return "redirect:/kitchen/kanban?fromDate=" + today + "&toDate=" + today + "&filterStatus=";
             } else {
                 return "redirect:/employee/table/list";
             }

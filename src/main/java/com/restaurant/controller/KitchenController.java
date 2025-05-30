@@ -9,6 +9,7 @@ import com.restaurant.service.OrderDetailService;
 import com.restaurant.service.OrderService;
 import com.restaurant.service.MenuService;
 import com.restaurant.service.CategoryService;
+import com.restaurant.entity.Category;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,6 +25,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
 
 @Controller
 @RequestMapping("/kitchen")
@@ -44,9 +47,26 @@ public class KitchenController {
     // Hiển thị danh sách món PENDING
     @RequestMapping(value = "/pending", method = RequestMethod.GET)
     public String listPending(Model model) {
-        // Lấy tất cả OrderDetail pending và processing
-        List<OrderDetail> pendingDetails = orderDetailService.findByStatus("PENDING");
-        List<OrderDetail> processingDetails = orderDetailService.findByStatus("PROCESSING");
+        // Lấy chỉ các OrderDetail pending và processing của ngày hôm nay
+        // Lấy danh sách order hôm nay
+        List<Order> todayOrders = orderService.findAllToday();
+        Set<Long> todayOrderIds = new HashSet<>();
+        for (Order o : todayOrders) {
+            todayOrderIds.add(o.getOrderId());
+        }
+        // Lọc riêng từng status
+        List<OrderDetail> pendingDetails = new ArrayList<>();
+        for (OrderDetail od : orderDetailService.findByStatus("PENDING")) {
+            if (todayOrderIds.contains(od.getOrderId())) {
+                pendingDetails.add(od);
+            }
+        }
+        List<OrderDetail> processingDetails = new ArrayList<>();
+        for (OrderDetail od : orderDetailService.findByStatus("PROCESSING")) {
+            if (todayOrderIds.contains(od.getOrderId())) {
+                processingDetails.add(od);
+            }
+        }
 
         // Gộp 2 danh sách
         List<OrderDetail> allDetails = new ArrayList<>();
@@ -151,6 +171,7 @@ public class KitchenController {
     public String kitchenKanban(
             @RequestParam(value = "fromDate", required = false) String fromDateStr,
             @RequestParam(value = "toDate", required = false) String toDateStr,
+            @RequestParam(value = "filterStatus", required = false) String filterStatus,
             Model model) throws Exception {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         Calendar cal = Calendar.getInstance();
@@ -174,13 +195,17 @@ public class KitchenController {
             to = cal.getTime();
         }
         List<Order> allOrders = orderService.findAll();
-        List<Order> filteredOrders = new ArrayList<>();
+        // Filter by date range
+        List<Order> dateFiltered = new ArrayList<>();
         for (Order o : allOrders) {
-            if (from != null && to != null) {
-                if (o.getOrderTime().compareTo(from) >= 0 && o.getOrderTime().compareTo(to) <= 0) {
-                    filteredOrders.add(o);
-                }
-            } else {
+            if (o.getOrderTime().compareTo(from) >= 0 && o.getOrderTime().compareTo(to) <= 0) {
+                dateFiltered.add(o);
+            }
+        }
+        // Further filter by status if provided
+        List<Order> filteredOrders = new ArrayList<>();
+        for (Order o : dateFiltered) {
+            if (filterStatus == null || filterStatus.isEmpty() || filterStatus.equals(o.getStatus())) {
                 filteredOrders.add(o);
             }
         }
@@ -232,43 +257,63 @@ public class KitchenController {
         model.addAttribute("orderTotalMap", orderTotalMap);
         model.addAttribute("fromDate", fromDateStr);
         model.addAttribute("toDate", toDateStr);
+        model.addAttribute("filterStatus", filterStatus);
         return "kitchen/pending-list";
     }
 
     // Đổi trạng thái order
     @RequestMapping(value = "/order/{id}/change-status", method = RequestMethod.POST)
-    public String changeOrderStatus(@PathVariable("id") Long orderId, @RequestParam("status") String status,
-            @RequestParam(value = "dateType", required = false, defaultValue = "today") String dateType,
-            @RequestParam(value = "specificDate", required = false) String specificDate) {
+    public String changeOrderStatus(@PathVariable("id") Long orderId,
+            @RequestParam("status") String status,
+            @RequestParam(value = "fromDate", required = false) String fromDateStr,
+            @RequestParam(value = "toDate", required = false) String toDateStr,
+            @RequestParam(value = "filterStatus", required = false) String filterStatus) {
         Order order = orderService.findById(orderId);
         if (order != null) {
             order.setStatus(status);
             orderService.save(order);
+            // Cập nhật trạng thái cho tất cả chi tiết đơn tương ứng
+            List<OrderDetail> details = orderDetailService.findByOrderId(orderId);
+            for (OrderDetail od : details) {
+                od.setStatus(status);
+                orderDetailService.save(od);
+            }
         }
         // Giữ lại filter khi reload lại bảng
-        String redirectUrl = "/kitchen/kanban?dateType=" + dateType;
-        if (specificDate != null && !specificDate.isEmpty()) {
-            redirectUrl += "&specificDate=" + specificDate;
+        String redirectUrl = "/kitchen/kanban";
+        boolean hasParam = false;
+        if (fromDateStr != null) {
+            redirectUrl += "?fromDate=" + fromDateStr;
+            hasParam = true;
+        }
+        if (toDateStr != null) {
+            redirectUrl += (hasParam ? "&" : "?") + "toDate=" + toDateStr;
+            hasParam = true;
+        }
+        if (filterStatus != null) {
+            redirectUrl += (hasParam ? "&" : "?") + "filterStatus=" + filterStatus;
         }
         return "redirect:" + redirectUrl;
     }
 
     // Đổi trạng thái order detail
     @RequestMapping(value = "/orderDetail/{id}/change-status", method = RequestMethod.POST)
-    public String changeOrderDetailStatus(@PathVariable("id") Long detailId, @RequestParam("status") String status,
-            @RequestParam(value = "dateType", required = false, defaultValue = "today") String dateType,
-            @RequestParam(value = "specificDate", required = false) String specificDate) {
+    public String changeOrderDetailStatus(@PathVariable("id") Long detailId,
+            @RequestParam("status") String status,
+            @RequestParam(value = "fromDate", required = false) String fromDateStr,
+            @RequestParam(value = "toDate", required = false) String toDateStr,
+            @RequestParam(value = "filterStatus", required = false) String filterStatus) {
         OrderDetail detail = orderDetailService.findById(detailId);
         if (detail != null) {
             detail.setStatus(status);
             orderDetailService.save(detail);
-            // Nếu tất cả món đã SERVED thì cập nhật order
             Long orderId = detail.getOrderId();
             List<OrderDetail> details = orderDetailService.findByOrderId(orderId);
-            boolean allServed = details.stream().allMatch(d -> "SERVED".equals(d.getStatus()));
+            boolean allServedOrCancelled = details.stream()
+                    .allMatch(d -> "SERVED".equals(d.getStatus()) || "CANCELLED".equals(d.getStatus()));
             boolean allCancelled = details.stream().allMatch(d -> "CANCELLED".equals(d.getStatus()));
             Order order = orderService.findById(orderId);
-            if (allServed && order != null) {
+            if (allServedOrCancelled && order != null) {
                 order.setStatus("SERVED");
                 orderService.save(order);
             } else if (allCancelled && order != null) {
@@ -277,9 +322,18 @@ public class KitchenController {
             }
         }
         // Giữ lại filter khi reload lại bảng
-        String redirectUrl = "/kitchen/kanban?dateType=" + dateType;
-        if (specificDate != null && !specificDate.isEmpty()) {
-            redirectUrl += "&specificDate=" + specificDate;
+        String redirectUrl = "/kitchen/kanban";
+        boolean hasP = false;
+        if (fromDateStr != null) {
+            redirectUrl += "?fromDate=" + fromDateStr;
+            hasP = true;
+        }
+        if (toDateStr != null) {
+            redirectUrl += (hasP ? "&" : "?") + "toDate=" + toDateStr;
+            hasP = true;
+        }
+        if (filterStatus != null) {
+            redirectUrl += (hasP ? "&" : "?") + "filterStatus=" + filterStatus;
         }
         return "redirect:" + redirectUrl;
     }
@@ -289,13 +343,14 @@ public class KitchenController {
     public String menuStatus(
             @RequestParam(value = "fromDate", required = false) String fromDateStr,
             @RequestParam(value = "toDate", required = false) String toDateStr,
+            @RequestParam(value = "categoryId", required = false) Long categoryId,
             Model model) throws Exception {
-        // Parse ngày
+        // Parse ngày, default ngày hôm nay nếu chưa cung cấp
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         Calendar cal = Calendar.getInstance();
-        java.util.Date from = null, to = null;
+        Date from = null, to = null;
         if (fromDateStr != null && !fromDateStr.isEmpty()) {
-            java.util.Date d = sdf.parse(fromDateStr);
+            Date d = sdf.parse(fromDateStr);
             cal.setTime(d);
             cal.set(Calendar.HOUR_OF_DAY, 0);
             cal.set(Calendar.MINUTE, 0);
@@ -304,7 +359,7 @@ public class KitchenController {
             from = cal.getTime();
         }
         if (toDateStr != null && !toDateStr.isEmpty()) {
-            java.util.Date d = sdf.parse(toDateStr);
+            Date d = sdf.parse(toDateStr);
             cal.setTime(d);
             cal.set(Calendar.HOUR_OF_DAY, 23);
             cal.set(Calendar.MINUTE, 59);
@@ -312,7 +367,6 @@ public class KitchenController {
             cal.set(Calendar.MILLISECOND, 999);
             to = cal.getTime();
         }
-        // Lấy đơn hàng theo khoảng thời gian
         List<Order> allOrders = orderService.findAll();
         List<Order> filteredOrders = new ArrayList<>();
         for (Order o : allOrders) {
@@ -347,8 +401,19 @@ public class KitchenController {
                 }
             }
         }
-        List<Menu> menus = menuService.findAll();
+        // Lấy và lọc các menu theo category
+        List<Menu> allMenus = menuService.findAll();
+        List<Menu> menus = new ArrayList<>();
+        for (Menu m : allMenus) {
+            if (categoryId == null || categoryId.equals(m.getCategory().getCategoryId())) {
+                menus.add(m);
+            }
+        }
         model.addAttribute("menus", menus);
+        // Danh sách category cho dropdown filter
+        List<Category> categories = categoryService.findAll();
+        model.addAttribute("categories", categories);
+        model.addAttribute("selectedCategory", categoryId);
         model.addAttribute("revenueMap", revenueMap);
         model.addAttribute("orderCountMap", orderCountMap);
         model.addAttribute("cancelCountMap", cancelCountMap);

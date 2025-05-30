@@ -18,19 +18,16 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
     />
     <link
       rel="stylesheet"
+      href="${pageContext.request.contextPath}/resources/css/employee/menu-style.css"
+    />
+    <link
+      rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
-    <style>
-      .order-table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 14px; box-shadow: 0 1px 6px rgba(80,120,200,0.08); overflow: hidden; }
-      .order-table th, .order-table td { padding: 12px 10px; text-align: center; border-bottom: 1px solid #f0f0f0; }
-      .order-table th { background: #f8fafc; color: #b0b0b0; font-weight: 500; border-top-left-radius: 14px; border-top-right-radius: 14px; }
-      .order-table tr:hover { background: #f5f7fa; }
-      .pastel-status-dropdown { border-radius: 7px; border: 1.5px solid #e0e7ef; background: #f8fafc; padding: 4px 10px; font-weight: 500; color: #333; }
-      .order-filter { display: flex; gap: 12px; align-items: center; width: 100%; margin-bottom: 18px; }
-      .order-filter label { color: #888; font-size: 1em; }
-      .order-filter input[type=date] { padding: 6px 12px; border-radius: 7px; border: 1px solid #d1d5db; background: #f8fafc; font-size: 1em; height: 36px; }
-      .order-filter .btn { background: linear-gradient(90deg, #667eea, #764ba2); color: #fff; border: none; border-radius: 7px; padding: 7px 32px; font-weight: 500; height: 36px; min-width: 120px; font-size: 1.08em; }
-    </style>
+    <link
+      rel="stylesheet"
+      href="${pageContext.request.contextPath}/resources/css/employee/kitchen.css"
+    />
   </head>
   <body>
     <div class="manager-layout">
@@ -43,7 +40,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
         <nav class="sidebar-nav">
           <div class="sidebar-nav-item">
             <a
-              href="${pageContext.request.contextPath}/kitchen/kanban?fromDate=${fromDate}&toDate=${toDate}"
+              href="${pageContext.request.contextPath}/kitchen/kanban?fromDate=<%= java.time.LocalDate.now() %>&toDate=<%= java.time.LocalDate.now() %>&filterStatus="
               class="sidebar-nav-link"
             >
               <i class="fas fa-receipt sidebar-nav-icon"></i>
@@ -81,17 +78,21 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
           </div>
         </div>
         <div class="manager-content">
-          <div class="card">
-            <div class="card-header">
-              <div class="card-title">Danh sách món ăn</div>
-              <div class="card-subtitle">Đóng/mở món trên menu</div>
-            </div>
-            <!-- Filter date range -->
+          <div class="card menu-status-card">
+
+            <!-- Filter date range and category -->
             <form method="get" action="${pageContext.request.contextPath}/kitchen/menu-status" class="order-filter">
               <label>Từ:</label>
               <input type="date" name="fromDate" value="${fromDate}" />
               <label>Đến:</label>
               <input type="date" name="toDate" value="${toDate}" />
+              <label>Danh mục:</label>
+              <select name="categoryId" class="pastel-status-dropdown">
+                <option value="" <c:if test="${selectedCategory == null}">selected</c:if>>Tất cả</option>
+                <c:forEach var="cat" items="${categories}">
+                  <option value="${cat.categoryId}" <c:if test="${cat.categoryId == selectedCategory}">selected</c:if>>${cat.name}</option>
+                </c:forEach>
+              </select>
               <button type="submit" class="btn">Lọc</button>
             </form>
             <div class="table-container">

@@ -511,10 +511,28 @@ body {
     gap: var(--space-lg);
 }
 
+/* Statistics Grid - for cards layout */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--space-lg);
+    margin-bottom: var(--space-2xl);
+}
+
+.stats-grid .card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stats-grid .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
 .grid-cols-1 { grid-template-columns: repeat(1, 1fr); }
 .grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
 .grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
 .grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+.grid-cols-5 { grid-template-columns: repeat(5, 1fr); }
 
 /* Flex utilities */
 .flex { display: flex; }
@@ -572,6 +590,13 @@ body {
 .text-gray-600 { color: var(--gray-600); }
 .text-gray-700 { color: var(--gray-700); }
 .text-gray-900 { color: var(--gray-900); }
+
+/* Color utilities for stats */
+.text-primary-color { color: var(--primary-color) !important; }
+.text-success-color { color: var(--success-color) !important; }
+.text-warning-color { color: var(--warning-color) !important; }
+.text-info-color { color: var(--info-color) !important; }
+.text-danger-color { color: var(--danger-color) !important; }
 
 /* Loading states */
 .loading {
@@ -642,7 +667,8 @@ body {
     }
     
     .grid-cols-3,
-    .grid-cols-4 {
+    .grid-cols-4,
+    .grid-cols-5 {
         grid-template-columns: repeat(2, 1fr);
     }
 }
@@ -650,7 +676,8 @@ body {
 @media (max-width: 640px) {
     .grid-cols-2,
     .grid-cols-3,
-    .grid-cols-4 {
+    .grid-cols-4,
+    .grid-cols-5 {
         grid-template-columns: 1fr;
     }
     

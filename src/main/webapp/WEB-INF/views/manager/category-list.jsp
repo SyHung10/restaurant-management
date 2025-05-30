@@ -1,171 +1,262 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-pageEncoding="UTF-8" %> <%@ taglib prefix="c"
-uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>Quản lý danh mục</title>
-    <link
-      rel="stylesheet"
-      href="${pageContext.request.contextPath}/resources/css/common/style.css"
-    />
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 20px;
-        background-color: #f9f9f9;
-      }
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý danh mục - HT Restaurant Manager</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/manager/global.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/manager/category-management.css">
+</head>
+<body>
+    <div class="manager-layout">
+        <!-- Sidebar -->
+        <div class="manager-sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">🍴 HT POS</div>
+                <div class="sidebar-subtitle">Hệ thống quản lý nhà hàng</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="sidebar-nav-item">
+                    <a href="${pageContext.request.contextPath}/manager/dashboard" class="sidebar-nav-link">
+                        <i class="fas fa-tachometer-alt sidebar-nav-icon"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+                <div class="sidebar-nav-item">
+                    <a href="${pageContext.request.contextPath}/manager/tables" class="sidebar-nav-link">
+                        <i class="fas fa-th sidebar-nav-icon"></i>
+                        <span>Quản lý bàn</span>
+                    </a>
+                </div>
+                <div class="sidebar-nav-item">
+                    <a href="${pageContext.request.contextPath}/manager/menus" class="sidebar-nav-link">
+                        <i class="fas fa-utensils sidebar-nav-icon"></i>
+                        <span>Quản lý món ăn</span>
+                    </a>
+                </div>
+                <div class="sidebar-nav-item">
+                    <a href="${pageContext.request.contextPath}/manager/categories" class="sidebar-nav-link active">
+                        <i class="fas fa-tags sidebar-nav-icon"></i>
+                        <span>Quản lý danh mục</span>
+                    </a>
+                </div>
+                <div class="sidebar-nav-item">
+                    <a href="${pageContext.request.contextPath}/manager/employees" class="sidebar-nav-link">
+                        <i class="fas fa-users sidebar-nav-icon"></i>
+                        <span>Quản lý nhân viên</span>
+                    </a>
+                </div>
+                <div class="sidebar-nav-item">
+                    <a href="${pageContext.request.contextPath}/manager/promotions" class="sidebar-nav-link">
+                        <i class="fas fa-percent sidebar-nav-icon"></i>
+                        <span>Quản lý khuyến mãi</span>
+                    </a>
+                </div>
+                <div class="sidebar-nav-item">
+                    <a href="${pageContext.request.contextPath}/manager/reports" class="sidebar-nav-link">
+                        <i class="fas fa-chart-bar sidebar-nav-icon"></i>
+                        <span>Báo cáo</span>
+                    </a>
+                </div>
+                <div class="sidebar-nav-item logout-item" style="margin-top: auto">
+                    <a href="${pageContext.request.contextPath}/logout" class="sidebar-nav-link">
+                        <i class="fas fa-sign-out-alt sidebar-nav-icon"></i>
+                        <span>Đăng xuất</span>
+                    </a>
+                </div>
+            </nav>
+        </div>
 
-      h1 {
-        color: #333;
-        margin-bottom: 20px;
-      }
+        <!-- Main Content -->
+        <div class="manager-main">
+            <div class="manager-header">
+                <div class="category-header">
+                    <div class="category-header-left">
+                        <h1 class="page-title">
+                            <i class="fas fa-tags"></i> Quản lý danh mục
+                        </h1>
+                        <p class="page-subtitle">Quản lý danh mục món ăn và thống kê</p>
+                    </div>
+                    <div class="category-header-right">
+                        <a href="${pageContext.request.contextPath}/manager/categories/new" class="btn-primary">
+                            <i class="fas fa-plus"></i>
+                            <span>Thêm danh mục</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
 
-      .btn-add {
-        display: inline-block;
-        margin-bottom: 20px;
-        padding: 10px 20px;
-        background-color: #4caf50;
-        color: white;
-        text-decoration: none;
-        border-radius: 4px;
-      }
+            <div class="manager-content category-management-container">
+                <!-- Statistics Section -->
+                <div class="stats-section fade-in">
+                    <div class="stat-card">
+                        <div class="stat-number">${categories.size()}</div>
+                        <div class="stat-label">Tổng danh mục</div>
+                        <i class="fas fa-tags stat-icon"></i>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">
+                            <c:set var="activeCount" value="0"/>
+                            <c:forEach var="category" items="${categories}">
+                                <c:if test="${category.status == 'ACTIVE'}">
+                                    <c:set var="activeCount" value="${activeCount + 1}"/>
+                                </c:if>
+                            </c:forEach>
+                            ${activeCount}
+                        </div>
+                        <div class="stat-label">Danh mục kích hoạt</div>
+                        <i class="fas fa-check-circle stat-icon"></i>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">
+                            <c:set var="inactiveCount" value="0"/>
+                            <c:forEach var="category" items="${categories}">
+                                <c:if test="${category.status == 'INACTIVE'}">
+                                    <c:set var="inactiveCount" value="${inactiveCount + 1}"/>
+                                </c:if>
+                            </c:forEach>
+                            ${inactiveCount}
+                        </div>
+                        <div class="stat-label">Danh mục tạm ngưng</div>
+                        <i class="fas fa-pause-circle stat-icon"></i>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">
+                            <c:choose>
+                                <c:when test="${categories.size() > 0}">
+                                    <c:set var="maxOrder" value="0"/>
+                                    <c:forEach var="category" items="${categories}">
+                                        <c:if test="${category.displayOrder > maxOrder}">
+                                            <c:set var="maxOrder" value="${category.displayOrder}"/>
+                                        </c:if>
+                                    </c:forEach>
+                                    ${maxOrder}
+                                </c:when>
+                                <c:otherwise>0</c:otherwise>
+                            </c:choose>
+                        </div>
+                        <div class="stat-label">Thứ tự cao nhất</div>
+                        <i class="fas fa-sort-numeric-up stat-icon"></i>
+                    </div>
+                </div>
 
-      .btn-add:hover {
-        background-color: #45a049;
-      }
+                <!-- Error/Success Messages -->
+                <c:if test="${not empty param.error}">
+                    <div class="error-message fade-in">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        ${param.error}
+                    </div>
+                </c:if>
+                
+                <c:if test="${not empty param.success}">
+                    <div class="success-message fade-in">
+                        <i class="fas fa-check-circle"></i>
+                        ${param.success}
+                    </div>
+                </c:if>
 
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        background-color: white;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      }
+                <!-- Filter Section -->
+                <div class="filter-section fade-in">
+                    <form method="get" action="${pageContext.request.contextPath}/manager/categories" class="filter-row">
+                        <div class="filter-group">
+                            <label class="filter-label">Trạng thái:</label>
+                            <select name="status" class="filter-select" onchange="this.form.submit()">
+                                <option value="">Tất cả trạng thái</option>
+                                <option value="ACTIVE" ${param.status == 'ACTIVE' ? 'selected' : ''}>Kích hoạt</option>
+                                <option value="INACTIVE" ${param.status == 'INACTIVE' ? 'selected' : ''}>Tạm ngưng</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
 
-      th,
-      td {
-        padding: 12px 15px;
-        text-align: left;
-        border-bottom: 1px solid #ddd;
-      }
+                <!-- Category Table -->
+                <div class="card fade-in">
+                    <div class="card-header">
+                        <div class="card-title">Danh sách danh mục</div>
+                        <div class="card-subtitle">Quản lý toàn bộ danh mục món ăn</div>
+                    </div>
+                    <div class="table-container">
+                        <table class="category-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Mã danh mục</th>
+                                    <th>Tên danh mục</th>
+                                    <th>Thứ tự hiển thị</th>
+                                    <th>Trạng thái</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <c:forEach var="category" items="${categories}">
+                                    <tr>
+                                        <td>
+                                            <div style="font-weight: 600; color: #64748b;">#${category.categoryId}</div>
+                                        </td>
+                                        <td>
+                                            <div style="font-weight: 600; color: #1e293b;">${category.code}</div>
+                                        </td>
+                                        <td>
+                                            <div style="font-weight: 600; color: #1e293b;">${category.name}</div>
+                                        </td>
+                                        <td>
+                                            <div style="font-weight: 600; color: #059669;">${category.displayOrder}</div>
+                                        </td>
+                                        <td>
+                                            <c:choose>
+                                                <c:when test="${category.status == 'ACTIVE'}">
+                                                    <span class="status-badge status-active">
+                                                        <i class="fas fa-check-circle"></i>
+                                                        Kích hoạt
+                                                    </span>
+                                                </c:when>
+                                                <c:when test="${category.status == 'INACTIVE'}">
+                                                    <span class="status-badge status-inactive">
+                                                        <i class="fas fa-pause-circle"></i>
+                                                        Tạm ngưng
+                                                    </span>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <span class="status-badge">${category.status}</span>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <a href="${pageContext.request.contextPath}/manager/categories/edit/${category.categoryId}" 
+                                                   class="action-btn action-btn-edit" title="Chỉnh sửa">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="${pageContext.request.contextPath}/manager/categories/delete/${category.categoryId}" 
+                                                   class="action-btn action-btn-delete" title="Xóa"
+                                                   onclick="return confirm('Bạn có chắc chắn muốn xóa danh mục ${category.name} không?')">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </c:forEach>
+                                <c:if test="${empty categories}">
+                                    <tr>
+                                        <td colspan="6" style="text-align: center; padding: 40px; color: #64748b;">
+                                            <i class="fas fa-tags" style="font-size: 48px; margin-bottom: 16px; opacity: 0.3;"></i>
+                                            <div style="font-size: 16px; font-weight: 500;">Chưa có danh mục nào</div>
+                                            <div style="font-size: 14px; margin-top: 8px;">Nhấn "Thêm danh mục" để bắt đầu</div>
+                                        </td>
+                                    </tr>
+                                </c:if>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-      th {
-        background-color: #f2f2f2;
-        font-weight: bold;
-      }
-
-      tr:hover {
-        background-color: #f5f5f5;
-      }
-
-      .action-links a {
-        margin-right: 10px;
-        text-decoration: none;
-      }
-
-      .edit-link {
-        color: #2196f3;
-      }
-
-      .delete-link {
-        color: #f44336;
-      }
-
-      .back-link {
-        display: inline-block;
-        margin-top: 20px;
-        color: #333;
-        text-decoration: none;
-      }
-
-      .error-message {
-        color: #f44336;
-        padding: 10px;
-        margin-bottom: 15px;
-        background-color: #ffebee;
-        border-radius: 4px;
-        border-left: 4px solid #f44336;
-      }
-
-      .badge {
-        padding: 4px 8px;
-        border-radius: 12px;
-        font-size: 12px;
-        font-weight: bold;
-      }
-
-      .badge-active {
-        background-color: #4caf50;
-        color: white;
-      }
-
-      .badge-inactive {
-        background-color: #f44336;
-        color: white;
-      }
-    </style>
-  </head>
-
-  <body>
-    <h1>Danh sách danh mục</h1>
-
-    <c:if test="${not empty param.error}">
-      <div class="error-message">${param.error}</div>
-    </c:if>
-
-    <a
-      href="${pageContext.request.contextPath}/manager/categories/new"
-      class="btn-add"
-      >Thêm danh mục mới</a
-    >
-    <table>
-      <tr>
-        <th>ID</th>
-        <th>Mã</th>
-        <th>Tên danh mục</th>
-        <th>Thứ tự hiển thị</th>
-        <th>Trạng thái</th>
-        <th>Hành động</th>
-      </tr>
-      <c:forEach var="category" items="${categories}">
-        <tr>
-          <td>${category.categoryId}</td>
-          <td>${category.code}</td>
-          <td>${category.name}</td>
-          <td>${category.displayOrder}</td>
-          <td>
-            <c:choose>
-              <c:when test="${category.status == 'ACTIVE'}">
-                <span class="badge badge-active">Kích hoạt</span>
-              </c:when>
-              <c:when test="${category.status == 'INACTIVE'}">
-                <span class="badge badge-inactive">Không kích hoạt</span>
-              </c:when>
-              <c:otherwise>${category.status}</c:otherwise>
-            </c:choose>
-          </td>
-          <td class="action-links">
-            <a
-              href="${pageContext.request.contextPath}/manager/categories/edit/${category.categoryId}"
-              class="edit-link"
-              >Sửa</a
-            >
-            <a
-              href="${pageContext.request.contextPath}/manager/categories/delete/${category.categoryId}"
-              onclick="return confirm('Bạn có chắc muốn xóa danh mục ${category.name}?')"
-              class="delete-link"
-              >Xóa</a
-            >
-          </td>
-        </tr>
-      </c:forEach>
-    </table>
-    <a
-      href="${pageContext.request.contextPath}/manager/dashboard"
-      class="back-link"
-      >Quay lại Dashboard</a
-    >
-  </body>
+    <!-- JavaScript cho category management -->
+    <script src="${pageContext.request.contextPath}/resources/js/manager/category-management.js"></script>
+</body>
 </html>

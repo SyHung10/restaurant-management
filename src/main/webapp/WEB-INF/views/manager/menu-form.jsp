@@ -40,6 +40,12 @@
                             </a>
                         </div>
                         <div class="sidebar-nav-item">
+                            <a href="${pageContext.request.contextPath}/manager/categories" class="sidebar-nav-link">
+                                <i class="fas fa-tags sidebar-nav-icon"></i>
+                                <span>Quản lý danh mục</span>
+                            </a>
+                        </div>
+                        <div class="sidebar-nav-item">
                             <a href="${pageContext.request.contextPath}/manager/employees" class="sidebar-nav-link">
                                 <i class="fas fa-users sidebar-nav-icon"></i>
                                 <span>Quản lý nhân viên</span>
@@ -55,6 +61,12 @@
                             <a href="${pageContext.request.contextPath}/manager/reports" class="sidebar-nav-link">
                                 <i class="fas fa-chart-bar sidebar-nav-icon"></i>
                                 <span>Báo cáo</span>
+                            </a>
+                        </div>
+                        <div class="sidebar-nav-item logout-item" style="margin-top: auto">
+                            <a href="${pageContext.request.contextPath}/logout" class="sidebar-nav-link">
+                                <i class="fas fa-sign-out-alt sidebar-nav-icon"></i>
+                                <span>Đăng xuất</span>
                             </a>
                         </div>
                     </nav>

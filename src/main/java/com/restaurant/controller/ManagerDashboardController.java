@@ -4,10 +4,14 @@ import com.restaurant.entity.Category;
 import com.restaurant.entity.Employee;
 import com.restaurant.entity.Menu;
 import com.restaurant.entity.RestaurantTable;
+import com.restaurant.entity.Order;
+import com.restaurant.entity.OrderDetail;
 import com.restaurant.service.CategoryService;
 import com.restaurant.service.EmployeeService;
 import com.restaurant.service.MenuService;
 import com.restaurant.service.TableService;
+import com.restaurant.service.OrderService;
+import com.restaurant.service.OrderDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,7 +25,15 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.ServletContext;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/manager")
@@ -41,6 +53,12 @@ public class ManagerDashboardController {
 
     @Autowired
     private ServletContext servletContext;
+
+    @Autowired
+    private OrderService orderService;
+
+    @Autowired
+    private OrderDetailService orderDetailService;
 
     // Trang dashboard chính
     @RequestMapping(value = "/dashboard", method = RequestMethod.GET)
@@ -86,9 +104,106 @@ public class ManagerDashboardController {
 
     // === Quản lý món ăn ===
     @RequestMapping(value = "/menus", method = RequestMethod.GET)
-    public String listMenus(Model model) {
-        model.addAttribute("menus", menuService.findAll());
-        return "manager/menu-list";
+    public String listMenus(
+            @RequestParam(value = "fromDate", required = false) String fromDateStr,
+            @RequestParam(value = "toDate", required = false) String toDateStr,
+            @RequestParam(value = "categoryId", required = false) Long categoryId,
+            @RequestParam(value = "status", required = false) String status,
+            Model model) throws Exception {
+        
+        // Parse ngày tương tự như kitchen controller
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Calendar cal = Calendar.getInstance();
+        java.util.Date from = null, to = null;
+        
+        if (fromDateStr != null && !fromDateStr.isEmpty()) {
+            java.util.Date d = sdf.parse(fromDateStr);
+            cal.setTime(d);
+            cal.set(Calendar.HOUR_OF_DAY, 0);
+            cal.set(Calendar.MINUTE, 0);
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.MILLISECOND, 0);
+            from = cal.getTime();
+        }
+        
+        if (toDateStr != null && !toDateStr.isEmpty()) {
+            java.util.Date d = sdf.parse(toDateStr);
+            cal.setTime(d);
+            cal.set(Calendar.HOUR_OF_DAY, 23);
+            cal.set(Calendar.MINUTE, 59);
+            cal.set(Calendar.SECOND, 59);
+            cal.set(Calendar.MILLISECOND, 999);
+            to = cal.getTime();
+        }
+
+        // Lấy đơn hàng theo khoảng thời gian (clone logic từ kitchen)
+        List<Order> allOrders = orderService.findAll();
+        List<Order> filteredOrders = new ArrayList<>();
+        for (Order o : allOrders) {
+            if (from != null && to != null) {
+                if (o.getOrderTime().compareTo(from) >= 0 && o.getOrderTime().compareTo(to) <= 0) {
+                    filteredOrders.add(o);
+                }
+            } else {
+                filteredOrders.add(o);
+            }
+        }
+
+        // Tính báo cáo doanh thu (clone logic từ kitchen)
+        Map<Long, BigDecimal> revenueMap = new HashMap<>();
+        Map<Long, Integer> orderCountMap = new HashMap<>();
+        Map<Long, Integer> cancelCountMap = new HashMap<>();
+        BigDecimal totalRevenue = BigDecimal.ZERO;
+
+        for (Order order : filteredOrders) {
+            List<OrderDetail> details = orderDetailService.findByOrderId(order.getOrderId());
+            for (OrderDetail od : details) {
+                Long dishId = od.getDishId();
+                Menu menu = menuService.findById(dishId);
+                BigDecimal price = BigDecimal.valueOf(menu.getPrice());
+                int qty = od.getQuantity();
+
+                // Doanh thu chỉ tính món không bị hủy
+                BigDecimal rev = revenueMap.getOrDefault(dishId, BigDecimal.ZERO);
+                if (!"CANCELLED".equals(od.getStatus())) {
+                    BigDecimal itemRevenue = price.multiply(BigDecimal.valueOf(qty));
+                    rev = rev.add(itemRevenue);
+                    totalRevenue = totalRevenue.add(itemRevenue);
+                }
+                revenueMap.put(dishId, rev);
+
+                // Đếm số lượng
+                orderCountMap.put(dishId, orderCountMap.getOrDefault(dishId, 0) + qty);
+                if ("CANCELLED".equals(od.getStatus())) {
+                    cancelCountMap.put(dishId, cancelCountMap.getOrDefault(dishId, 0) + qty);
+                }
+            }
+        }
+
+        // Lấy danh sách món ăn và filter
+        List<Menu> menus = menuService.findAll();
+        List<Menu> filteredMenus = new ArrayList<>();
+        
+        for (Menu menu : menus) {
+            boolean categoryMatch = categoryId == null || menu.getCategory().getCategoryId().equals(categoryId);
+            boolean statusMatch = status == null || status.isEmpty() || menu.getStatus().equals(status);
+            
+            if (categoryMatch && statusMatch) {
+                filteredMenus.add(menu);
+            }
+        }
+
+        // Thêm dữ liệu vào model
+        model.addAttribute("menus", filteredMenus);
+        model.addAttribute("categories", categoryService.findAll());
+        model.addAttribute("revenueMap", revenueMap);
+        model.addAttribute("orderCountMap", orderCountMap);
+        model.addAttribute("cancelCountMap", cancelCountMap);
+        model.addAttribute("totalRevenue", totalRevenue);
+        model.addAttribute("fromDate", fromDateStr);
+        model.addAttribute("toDate", toDateStr);
+        
+        return "manager/menu-management";
     }
 
     @RequestMapping(value = "/menus/new", method = RequestMethod.GET)
@@ -116,29 +231,50 @@ public class ManagerDashboardController {
             }
 
             try {
-                // Tạo thư mục lưu ảnh nếu chưa tồn tại
-                String uploadPath = servletContext.getRealPath("/resources/images/menu");
-                File uploadDir = new File(uploadPath);
-                if (!uploadDir.exists()) {
-                    uploadDir.mkdirs();
+                // Lưu vào source directory (để persistent và chia sẻ với team)
+                String projectPath = System.getProperty("user.dir");
+                String sourceUploadPath = projectPath + "/src/main/webapp/resources/images/menu";
+                File sourceUploadDir = new File(sourceUploadPath);
+                if (!sourceUploadDir.exists()) {
+                    sourceUploadDir.mkdirs();
                 }
 
-                // Nếu đang cập nhật món ăn và có ảnh cũ, xóa ảnh cũ
+                // Lưu vào runtime directory (để server có thể serve ngay)
+                String runtimeUploadPath = servletContext.getRealPath("/resources/images/menu");
+                File runtimeUploadDir = new File(runtimeUploadPath);
+                if (!runtimeUploadDir.exists()) {
+                    runtimeUploadDir.mkdirs();
+                }
+
+                // Nếu đang cập nhật món ăn và có ảnh cũ, xóa ảnh cũ ở cả 2 nơi
                 if (menu.getDishId() != null && menu.getImageUrl() != null && !menu.getImageUrl().isEmpty()) {
-                    String oldImagePath = servletContext.getRealPath(menu.getImageUrl());
-                    File oldImageFile = new File(oldImagePath);
-                    if (oldImageFile.exists()) {
-                        oldImageFile.delete();
+                    String oldFileName = menu.getImageUrl().substring(menu.getImageUrl().lastIndexOf("/") + 1);
+                    
+                    // Xóa ảnh cũ ở source
+                    File oldSourceFile = new File(sourceUploadPath + File.separator + oldFileName);
+                    if (oldSourceFile.exists()) {
+                        oldSourceFile.delete();
+                    }
+                    
+                    // Xóa ảnh cũ ở runtime
+                    String oldRuntimePath = servletContext.getRealPath(menu.getImageUrl());
+                    File oldRuntimeFile = new File(oldRuntimePath);
+                    if (oldRuntimeFile.exists()) {
+                        oldRuntimeFile.delete();
                     }
                 }
 
                 // Tạo tên file duy nhất
                 String fileName = System.currentTimeMillis() + "_" + imageFile.getOriginalFilename();
-                String filePath = uploadPath + File.separator + fileName;
 
-                // Lưu file vào thư mục
-                File dest = new File(filePath);
-                imageFile.transferTo(dest);
+                // Lưu file vào source directory
+                File sourceDestFile = new File(sourceUploadPath + File.separator + fileName);
+                imageFile.transferTo(sourceDestFile);
+
+                // Copy file từ source sang runtime directory
+                File runtimeDestFile = new File(runtimeUploadPath + File.separator + fileName);
+                java.nio.file.Files.copy(sourceDestFile.toPath(), runtimeDestFile.toPath(), 
+                    java.nio.file.StandardCopyOption.REPLACE_EXISTING);
 
                 // Cập nhật đường dẫn ảnh vào đối tượng menu
                 menu.setImageUrl("/resources/images/menu/" + fileName);
@@ -267,5 +403,44 @@ public class ManagerDashboardController {
 
         categoryService.delete(id);
         return "redirect:/manager/categories";
+    }
+
+    // Thêm method để change status từ manager
+    @RequestMapping(value = "/menu/{id}/change-status", method = RequestMethod.POST)
+    public String changeMenuStatusFromManager(@PathVariable("id") Long menuId,
+            @RequestParam("newStatus") String newStatus,
+            @RequestParam(value = "fromDate", required = false) String fromDateStr,
+            @RequestParam(value = "toDate", required = false) String toDateStr,
+            @RequestParam(value = "categoryId", required = false) String categoryIdStr,
+            @RequestParam(value = "status", required = false) String statusFilter) {
+        
+        Menu menu = menuService.findById(menuId);
+        if (menu != null) {
+            menu.setStatus("AVAILABLE".equals(newStatus) ? "AVAILABLE" : "UNAVAILABLE");
+            menuService.save(menu);
+        }
+        
+        // Redirect với tất cả parameters để giữ filter
+        String redirectUrl = "/manager/menus";
+        List<String> params = new ArrayList<>();
+        
+        if (fromDateStr != null && !fromDateStr.isEmpty()) {
+            params.add("fromDate=" + fromDateStr);
+        }
+        if (toDateStr != null && !toDateStr.isEmpty()) {
+            params.add("toDate=" + toDateStr);
+        }
+        if (categoryIdStr != null && !categoryIdStr.isEmpty()) {
+            params.add("categoryId=" + categoryIdStr);
+        }
+        if (statusFilter != null && !statusFilter.isEmpty()) {
+            params.add("status=" + statusFilter);
+        }
+        
+        if (!params.isEmpty()) {
+            redirectUrl += "?" + String.join("&", params);
+        }
+        
+        return "redirect:" + redirectUrl;
     }
 }

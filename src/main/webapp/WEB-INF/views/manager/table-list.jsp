@@ -60,6 +60,15 @@ uri="http://java.sun.com/jsp/jstl/functions" %>
           </div>
           <div class="sidebar-nav-item">
             <a
+              href="${pageContext.request.contextPath}/manager/categories"
+              class="sidebar-nav-link"
+            >
+              <i class="fas fa-tags sidebar-nav-icon"></i>
+              <span>Quản lý danh mục</span>
+            </a>
+          </div>
+          <div class="sidebar-nav-item">
+            <a
               href="${pageContext.request.contextPath}/manager/employees"
               class="sidebar-nav-link"
             >

@@ -1,0 +1,279 @@
+/* Custom styles for table cards - Minimal & Clickable Design */
+.table-card {
+  border: none;
+  padding: 0;
+  min-height: 160px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.table-card:active {
+  box-shadow: 0 2px 12px 0 rgba(80, 120, 200, 0.07);
+}
+
+/* Table-main màu theo trạng thái */
+.table-main {
+  border-radius: 18px;
+  margin: 0 auto 10px auto;
+  padding: 22px 36px 18px 36px;
+  min-width: 220px;
+  min-height: 140px;
+  max-height: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  box-shadow: 0 1px 6px 0 rgba(80, 120, 200, 0.08);
+  gap: 10px;
+  max-width: 440px;
+  word-break: break-word;
+}
+.table-main-AVAILABLE {
+  background: #e6faea;
+}
+.table-main-RESERVED {
+  background: #fff7e6;
+}
+.table-main-SERVING {
+  background: #e6f0fa;
+}
+.table-main-PENDING_PAYMENT {
+  background: #ffeaea;
+}
+.table-main-CLEANING {
+  background: #f5f5f5;
+}
+
+/* Ghế cùng màu với table-main */
+.seat-AVAILABLE {
+  background: #e6faea;
+  border: 1px solid #b6f5c9;
+}
+.seat-RESERVED {
+  background: #fff7e6;
+  border: 1px solid #ffe6b6;
+}
+.seat-SERVING {
+  background: #e6f0fa;
+  border: 1px solid #b6d4fa;
+}
+.seat-PENDING_PAYMENT {
+  background: #ffeaea;
+  border: 1px solid #ffb6b6;
+}
+.seat-CLEANING {
+  background: #f5f5f5;
+  border: 1px solid #e0e0e0;
+}
+
+.seat {
+  width: 60px;
+  height: 20px;
+  border-radius: 10px;
+  display: inline-block;
+  margin: 0;
+}
+
+.table-seats {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 0;
+}
+
+/* Khoảng cách ghế trên với table-main */
+.table-seats.top-seats {
+  margin-bottom: 10px;
+}
+
+.table-main-inner {
+  width: 100%;
+  max-width: 280px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.table-main-inner > div {
+  padding: 0 2px;
+  word-break: break-word;
+}
+
+.table-icon {
+  font-size: 1.2rem;
+  color: #8b4513;
+}
+
+.table-number {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #333;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+.table-status-icon {
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
+.table-info {
+  text-align: center;
+  margin-top: 12px;
+  font-size: 0.75rem;
+  color: var(--gray-600);
+  line-height: 1.4;
+}
+
+.capacity-info {
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: var(--gray-700);
+}
+
+.floor-info {
+  margin-bottom: 4px;
+  color: var(--gray-600);
+}
+
+.status-text {
+  font-weight: 500;
+  color: var(--gray-800);
+}
+
+.cleaning-actions {
+  margin-top: 12px;
+  width: 100%;
+}
+
+.btn-complete-cleaning {
+  background: var(--success-color);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  width: 100%;
+}
+
+.btn-complete-cleaning:hover {
+  background: #38a169;
+}
+
+.btn-complete-cleaning i {
+  margin-right: 4px;
+}
+
+.btn-soft-outline-success {
+  background: #fff;
+  color: #43b36a;
+  border: 1.5px solid #43b36a;
+  border-radius: 7px;
+  font-size: 1em;
+  font-family: inherit;
+  font-weight: 400;
+  padding: 0px 8px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+.btn-soft-outline-success:hover {
+  background: #e6faea;
+  color: #2e7d4f;
+  border-color: #2e7d4f;
+}
+
+/* Layout grid cho các bàn */
+.tables-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 32px 32px;
+  margin-top: 24px;
+  align-items: start;
+}
+
+/* Table Card Structure */
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  width: 100%;
+}
+
+.table-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  width: 100%;
+}
+
+.table-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cleaning-actions {
+  margin-top: 12px;
+  width: 100%;
+}
+
+.cleaning-actions form {
+  width: 100%;
+}
+
+.manager-content {
+  background: #fff;
+  border-radius: 18px;
+  padding: 24px 18px 32px 18px;
+  box-shadow: 0 2px 12px 0 rgba(80, 120, 200, 0.04);
+}
+
+.btn-main-action {
+  display: flex;
+  justify-content: center;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .table-main {
+    min-width: 90px;
+    min-height: 90px;
+    max-height: 90px;
+    padding: 14px 16px 12px 16px;
+  }
+  .seat {
+    width: 24px;
+    height: 14px;
+  }
+  .manager-content {
+    padding: 10px 4px 18px 4px;
+  }
+}
+
+@media (max-width: 600px) {
+  .table-main {
+    min-width: 70px;
+    min-height: 70px;
+    max-height: 70px;
+    padding: 8px 6px 8px 6px;
+  }
+  .seat {
+    width: 16px;
+    height: 10px;
+  }
+}
